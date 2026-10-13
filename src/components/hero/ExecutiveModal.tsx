@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { X, Sparkles, Download, Github, Linkedin, Mail, ExternalLink, CheckCircle2, Volume2 } from "lucide-react";
 import { DEVELOPER_PROFILE } from "@/lib/careerContext";
 import { SpeechManager } from "@/lib/speechHelper";
@@ -16,6 +16,28 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
   onClose,
   voiceActive,
 }) => {
+  // Bloqueia a rolagem da página de fundo enquanto o modal estiver aberto
+  useEffect(() => {
+    if (isOpen) {
+      const originalBodyOverflow = document.body.style.overflow;
+      const originalHtmlOverflow = document.documentElement.style.overflow;
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+
+      // Fechar modal ao pressionar tecla ESC
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") onClose();
+      };
+      window.addEventListener("keydown", handleKeyDown);
+
+      return () => {
+        document.body.style.overflow = originalBodyOverflow;
+        document.documentElement.style.overflow = originalHtmlOverflow;
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleReadSummary = () => {
@@ -25,7 +47,10 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+      onClick={onClose}
+    >
       <div 
         className="relative w-full max-w-2xl bg-[#0F172A] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
@@ -114,6 +139,51 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
                 {spec}
               </span>
             ))}
+          </div>
+        </div>
+
+        {/* Pilares Arquiteturais & Filosofia de Engenharia */}
+        <div className="mt-6">
+          <h3 className="text-xs uppercase font-mono tracking-wider text-gray-400 mb-2.5">
+            Pilares de Arquitetura & Engenharia
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#00F2FE] mt-1.5 shrink-0" />
+              <div>
+                <strong className="text-white block font-medium">Clean Architecture & SOLID</strong>
+                <p className="text-gray-400 text-[11px] mt-0.5 leading-snug">
+                  Código desacoplado, testabilidade e manutenibilidade contínua.
+                </p>
+              </div>
+            </div>
+            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#A855F7] mt-1.5 shrink-0" />
+              <div>
+                <strong className="text-white block font-medium">Concorrência & ACID</strong>
+                <p className="text-gray-400 text-[11px] mt-0.5 leading-snug">
+                  Transações atômicas, locks pessimistas e prevenção de race conditions.
+                </p>
+              </div>
+            </div>
+            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] mt-1.5 shrink-0" />
+              <div>
+                <strong className="text-white block font-medium">Otimização de Modelos IA</strong>
+                <p className="text-gray-400 text-[11px] mt-0.5 leading-snug">
+                  Conversão PyTorch para ONNX, quantização e inferência de ultra baixa latência.
+                </p>
+              </div>
+            </div>
+            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#10B981] mt-1.5 shrink-0" />
+              <div>
+                <strong className="text-white block font-medium">Resiliência & CI/CD</strong>
+                <p className="text-gray-400 text-[11px] mt-0.5 leading-snug">
+                  Containers Docker padronizados e pipelines de deploy com zero downtime.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 

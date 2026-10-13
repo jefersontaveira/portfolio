@@ -8,14 +8,16 @@ interface NavbarProps {
   onOpenExecutiveModal: () => void;
   voiceActive: boolean;
   onToggleVoice: () => void;
-  onReplayHologram?: () => void;
+  isJeffVisible?: boolean;
+  onToggleJeff?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenExecutiveModal,
   voiceActive,
   onToggleVoice,
-  onReplayHologram,
+  isJeffVisible = true,
+  onToggleJeff,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -29,8 +31,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header suppressHydrationWarning className="sticky top-0 z-30 w-full backdrop-blur-md bg-[#080B11]/80 border-b border-white/5 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header suppressHydrationWarning className="sticky top-0 z-30 w-full backdrop-blur-xl bg-[#080B11]/75 border-b border-white/[0.08] transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 sm:h-[84px] flex items-center justify-between">
         {/* Brand / Logo */}
         <a href="#hero" className="flex items-center gap-2 group">
           <div suppressHydrationWarning className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#00F2FE]/20 to-[#A855F7]/20 border border-[#00F2FE]/30 flex items-center justify-center text-[#00F2FE] group-hover:border-[#00F2FE] transition-colors">
@@ -52,36 +54,30 @@ export const Navbar: React.FC<NavbarProps> = ({
           <a href="#projetos" className="hover:text-[#00F2FE] transition-colors">
             Projetos
           </a>
-          <a href="#ia-lab" className="hover:text-[#00F2FE] transition-colors flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-[#00F2FE]" />
-            Laboratório IA
-          </a>
-          <a href="#arena-saas" className="hover:text-[#A855F7] transition-colors">
-            SaaS Django
-          </a>
-          <a href="#devops-cluster" className="hover:text-[#10B981] transition-colors">
-            DevOps & Chaos
-          </a>
         </nav>
 
         {/* Action Controls */}
         <div className="hidden sm:flex items-center gap-2.5">
-          {/* Hologram Replay Button */}
-          {onReplayHologram && (
+          {/* Jeff Presence Toggle (Ocultar / Exibir o Jeff) */}
+          {onToggleJeff && (
             <button
-              onClick={onReplayHologram}
-              title="Rever holograma inicial"
-              className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-[#00F2FE]/50 text-gray-300 hover:text-white text-xs font-mono flex items-center gap-1.5 transition-all"
+              onClick={onToggleJeff}
+              title={isJeffVisible ? "Ocultar assistente holográfico Jeff" : "Exibir assistente holográfico Jeff"}
+              className={`px-2.5 py-1.5 rounded-lg border text-xs font-mono flex items-center gap-1.5 transition-all ${
+                isJeffVisible
+                  ? "bg-[#00F2FE]/15 border-[#00F2FE]/50 text-[#00F2FE] hover:bg-[#00F2FE]/25"
+                  : "bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20"
+              }`}
             >
-              <Radio className="w-3.5 h-3.5 text-[#00F2FE]" />
-              <span className="hidden xl:inline">Holograma</span>
+              <Radio className={`w-3.5 h-3.5 ${isJeffVisible ? "animate-pulse text-[#00F2FE]" : "text-gray-400"}`} />
+              <span>{isJeffVisible ? "Jeff ON" : "Jeff OFF"}</span>
             </button>
           )}
 
           {/* Voice Toggle Button */}
           <button
             onClick={handleVoiceToggle}
-            title={voiceActive ? "Silenciar narração do ORB" : "Ativar narração por voz do ORB"}
+            title={voiceActive ? "Silenciar narração de Jeff" : "Ativar narração por voz de Jeff"}
             className={`p-2 rounded-lg border text-xs flex items-center gap-1.5 transition-all ${
               voiceActive
                 ? "bg-[#10B981]/15 border-[#10B981]/50 text-[#10B981]"
@@ -137,28 +133,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               Projetos
             </a>
-            <a
-              href="#ia-lab"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#00F2FE] flex items-center gap-2"
-            >
-              <Sparkles className="w-4 h-4 text-[#00F2FE]" />
-              Laboratório de IA (ONNX)
-            </a>
-            <a
-              href="#arena-saas"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#A855F7]"
-            >
-              SaaS de Arenas (Django)
-            </a>
-            <a
-              href="#devops-cluster"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#10B981]"
-            >
-              DevOps & Chaos Simulator
-            </a>
           </div>
 
           <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
@@ -172,6 +146,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Sparkles className="w-4 h-4 text-[#00F2FE]" />
               Modo Executivo Rápido (1 Minuto)
             </button>
+            {onToggleJeff && (
+              <button
+                onClick={() => {
+                  onToggleJeff();
+                }}
+                className={`w-full py-2.5 px-3 rounded-lg border text-xs font-mono flex items-center justify-center gap-2 transition-all ${
+                  isJeffVisible
+                    ? "bg-[#00F2FE]/15 border-[#00F2FE]/50 text-[#00F2FE]"
+                    : "bg-white/5 border-white/10 text-gray-400"
+                }`}
+              >
+                <Radio className={`w-4 h-4 ${isJeffVisible ? "animate-pulse text-[#00F2FE]" : "text-gray-400"}`} />
+                <span>{isJeffVisible ? "Assistente Jeff: Ativo (Toque para Ocultar)" : "Assistente Jeff: Oculto (Toque para Exibir)"}</span>
+              </button>
+            )}
+
             <div className="flex gap-2">
               <button
                 onClick={handleVoiceToggle}
@@ -182,7 +172,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }`}
               >
                 {voiceActive ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                <span>{voiceActive ? "Voz Ativada" : "Ativar Voz"}</span>
+                <span>{voiceActive ? "Voz Jeff ON" : "Voz Jeff OFF"}</span>
               </button>
               <a
                 href="/resume.pdf"

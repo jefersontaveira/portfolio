@@ -6,12 +6,16 @@ import { SpeechManager } from "@/lib/speechHelper";
 
 interface HologramIntroProps {
   isDocked?: boolean;
+  isJeffVisible?: boolean;
+  isChatOpen?: boolean;
   onEnterPortfolio: () => void;
   onOpenChat?: () => void;
 }
 
 export const HologramIntro: React.FC<HologramIntroProps> = ({
   isDocked: propIsDocked,
+  isJeffVisible = true,
+  isChatOpen = false,
   onEnterPortfolio,
   onOpenChat,
 }) => {
@@ -33,7 +37,7 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
 
   const isDocked = propIsDocked !== undefined ? propIsDocked : internalDocked;
 
-  const welcomeVoiceText = "Sistemas online. Seja bem-vindo ao portfólio de Jeferson Taveira.";
+  const welcomeVoiceText = "Sistema ativo. Bem-vindo ao portfólio de Jeferson Taveira.";
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -410,7 +414,12 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
     ? (dimensions.width < 380 ? "12px" : "16px")
     : "24px";
 
-  const containerSize = isDocked ? dockedSize : centralSize;
+  // Tamanho quando ancorado no topo do modal de IA:
+  const chatSize = isMobile ? 120 : 155;
+
+  const containerSize = isDocked
+    ? (isChatOpen ? chatSize : dockedSize)
+    : centralSize;
 
   return (
     <>
@@ -437,30 +446,45 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
       </div>
 
       {/* ============================================================== */}
-      {/* HOLOGRAMA PERMANENTE: AMPLIADO NO PC, RESPONSIVO NO CELULAR */}
+      {/* HOLOGRAMA PERMANENTE JEFF: DESLOCAMENTO DINÂMICO PARA A ABA DE IA */}
       {/* ============================================================== */}
       <div
         suppressHydrationWarning
         style={{
           position: "fixed",
-          zIndex: 50,
-          right: isDocked ? dockedMargin : "50%",
-          bottom: isDocked ? dockedMargin : "50%",
-          transform: isDocked ? "translate(0, 0)" : "translate(50%, 50%)",
+          zIndex: isChatOpen ? 60 : 50,
+          right: isDocked ? (isChatOpen ? "50%" : dockedMargin) : "50%",
+          bottom: isDocked 
+            ? (isChatOpen 
+                ? (isMobile ? "calc(50% + 39vh - 20px)" : "calc(50% + 295px - 32px)") 
+                : dockedMargin) 
+            : "50%",
+          transform: isDocked 
+            ? (isChatOpen 
+                ? "translate(50%, 50%) scale(1)" 
+                : (isJeffVisible ? "translate(0, 0) scale(1)" : "translate(0, 0) scale(0.7)")) 
+            : "translate(50%, 50%)",
           width: `${containerSize}px`,
           height: `${containerSize}px`,
           aspectRatio: "1 / 1",
-          transition: "all 1s cubic-bezier(0.25, 1, 0.5, 1)",
-          pointerEvents: isDocked ? "auto" : (hologramVisible ? "auto" : "none"),
+          transition: "all 0.85s cubic-bezier(0.25, 1, 0.5, 1)",
+          pointerEvents: isDocked 
+            ? (isChatOpen ? "none" : (isJeffVisible ? "auto" : "none")) 
+            : (hologramVisible ? "auto" : "none"),
         }}
         onClick={() => {
-          if (isDocked && onOpenChat) {
+          if (isDocked && !isChatOpen && isJeffVisible && onOpenChat) {
             onOpenChat();
           }
         }}
+        title={isDocked && !isChatOpen ? "Jeff • Clique para conversar com a IA" : undefined}
         className={`flex items-center justify-center select-none shrink-0 ${
-          isDocked ? "cursor-pointer" : ""
-        } ${!hologramVisible && !isDocked ? "opacity-0" : "opacity-100"} transition-opacity duration-1000`}
+          isDocked && !isChatOpen ? (isJeffVisible ? "cursor-pointer" : "pointer-events-none") : ""
+        } ${
+          isDocked
+            ? (isChatOpen || isJeffVisible ? "opacity-100" : "opacity-0")
+            : (!hologramVisible ? "opacity-0" : "opacity-100")
+        } transition-opacity duration-700`}
       >
         <canvas
           ref={canvasRef}

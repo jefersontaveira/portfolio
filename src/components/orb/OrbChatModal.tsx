@@ -10,6 +10,7 @@ interface ChatMessage {
   sender: "user" | "orb";
   text: string;
   timestamp: string;
+  isTyping?: boolean;
 }
 
 interface OrbChatModalProps {
@@ -20,9 +21,7 @@ interface OrbChatModalProps {
 
 const QUICK_PROMPT_CHIPS = [
   "Quais projetos em Python você desenvolveu?",
-  "Como foi modelado o SaaS de Arenas em Django?",
-  "Como funciona o classificador de desenhos com IA?",
-  "Quais suas stacks em DevOps e containers?",
+  "Como funciona o classificador de IA (ONNX)?",
   "Como posso entrar em contato ou contratar?",
 ];
 
@@ -35,7 +34,7 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
     {
       id: "welcome",
       sender: "orb",
-      text: `Olá! Sou o ORB, copiloto de engenharia do ${DEVELOPER_PROFILE.name}. Posso detalhar projetos em Python, arquitetura de IA, DevOps ou formas de contato. Como posso ajudar?`,
+      text: `Olá! Sou o Jeff, copiloto de inteligência artificial de Jeferson Taveira. Posso detalhar a arquitetura de projetos, tecnologias, visão computacional ou formas de contato. Como posso ajudar?`,
       timestamp: "Agora",
     },
   ]);
@@ -43,6 +42,14 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Limpeza de timers ao desmontar
+  useEffect(() => {
+    return () => {
+      if (typingTimerRef.current) clearInterval(typingTimerRef.current);
+    };
+  }, []);
 
   // Se houver uma query inicial (ex: vinda por voz)
   useEffect(() => {
@@ -50,6 +57,27 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
       sendMessage(initialQuery);
     }
   }, [initialQuery]);
+
+  // Bloqueia a rolagem da página ao fundo enquanto o chat do Jeff estiver aberto
+  useEffect(() => {
+    if (isOpen) {
+      const originalBodyOverflow = document.body.style.overflow;
+      const originalHtmlOverflow = document.documentElement.style.overflow;
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") onClose();
+      };
+      window.addEventListener("keydown", handleKeyDown);
+
+      return () => {
+        document.body.style.overflow = originalBodyOverflow;
+        document.documentElement.style.overflow = originalHtmlOverflow;
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -78,6 +106,47 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
     }
   };
 
+  // Efeito de digitação tipo ChatGPT (Typewriter streaming com auto-scroll)
+  const streamResponse = (fullText: string, messageId: string) => {
+    let currentIdx = 0;
+    const chunkSize = 2; // caracteres por tick
+    const speed = 16; // ms
+
+    // Cria mensagem vazia com estado de digitação ativo
+    const newMsg: ChatMessage = {
+      id: messageId,
+      sender: "orb",
+      text: "",
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      isTyping: true,
+    };
+
+    setMessages((prev) => [...prev, newMsg]);
+    setIsLoading(false);
+
+    if (typingTimerRef.current) clearInterval(typingTimerRef.current);
+
+    typingTimerRef.current = setInterval(() => {
+      currentIdx += chunkSize;
+      if (currentIdx >= fullText.length) {
+        if (typingTimerRef.current) clearInterval(typingTimerRef.current);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === messageId ? { ...m, text: fullText, isTyping: false } : m
+          )
+        );
+      } else {
+        const currentSlice = fullText.slice(0, currentIdx);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === messageId ? { ...m, text: currentSlice, isTyping: true } : m
+          )
+        );
+      }
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, speed);
+  };
+
   const sendMessage = async (contentToSend?: string) => {
     const text = (contentToSend || inputValue).trim();
     if (!text || isLoading) return;
@@ -102,13 +171,7 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
 
       if (response.ok) {
         const data = await response.json();
-        const orbMsg: ChatMessage = {
-          id: String(Date.now() + 1),
-          sender: "orb",
-          text: data.reply || "Resposta recebida.",
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        };
-        setMessages((prev) => [...prev, orbMsg]);
+        streamResponse(data.reply || "Resposta recebida.", String(Date.now() + 1));
       } else {
         throw new Error("Erro na resposta da API");
       }
@@ -124,24 +187,22 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
         fallbackText = `Você pode falar diretamente com o Jeferson pelo LinkedIn (${DEVELOPER_PROFILE.contact.linkedin}) ou conferir seus códigos no GitHub (${DEVELOPER_PROFILE.contact.github}).`;
       }
 
-      const orbMsg: ChatMessage = {
-        id: String(Date.now() + 1),
-        sender: "orb",
-        text: fallbackText,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      };
-      setMessages((prev) => [...prev, orbMsg]);
-    } finally {
-      setIsLoading(false);
+      streamResponse(fallbackText, String(Date.now() + 1));
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+      onClick={onClose}
+    >
       <div 
-        className="relative w-full max-w-xl bg-[#0F172A] border border-[#00F2FE]/20 rounded-2xl shadow-2xl flex flex-col h-[85vh] sm:h-[650px] overflow-hidden"
+        className="relative w-full max-w-xl bg-[#0F172A] border border-[#00F2FE]/25 rounded-2xl shadow-[0_0_50px_rgba(0,242,254,0.15)] flex flex-col h-[78vh] sm:h-[590px] overflow-hidden mt-12 sm:mt-16"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Glow Superior de Ancoragem Holográfica */}
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#00F2FE] to-transparent opacity-80" />
+
         {/* Header */}
         <div className="p-4 border-b border-white/10 flex items-center justify-between bg-[#080B11]/50">
           <div className="flex items-center gap-2.5">
@@ -152,7 +213,7 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h3 className="font-semibold text-white text-sm">ORB Copilot</h3>
+                <h3 className="font-semibold text-white text-sm">Jeff Copilot</h3>
                 <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#00F2FE]/10 text-[#00F2FE] font-mono border border-[#00F2FE]/20">
                   IA de Carreira
                 </span>
@@ -187,10 +248,15 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
                     : "bg-white/[0.04] border border-white/5 text-gray-200"
                 }`}
               >
-                <p>{msg.text}</p>
+                <p className="whitespace-pre-wrap">
+                  {msg.text}
+                  {msg.isTyping && (
+                    <span className="inline-block w-1.5 h-3.5 bg-[#00F2FE] ml-1 animate-pulse align-middle" />
+                  )}
+                </p>
                 <div className="mt-1.5 flex items-center justify-between text-[10px] text-gray-400 font-mono">
                   <span>{msg.timestamp}</span>
-                  {msg.sender === "orb" && (
+                  {msg.sender === "orb" && !msg.isTyping && (
                     <button
                       onClick={() => handleSpeech(msg.text)}
                       className="text-[#00F2FE] hover:underline flex items-center gap-1 ml-2"
@@ -206,23 +272,30 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
           ))}
 
           {isLoading && (
-            <div className="flex gap-2.5 items-center text-xs text-gray-400 font-mono">
-              <div className="w-6 h-6 rounded-full bg-[#A855F7]/20 text-[#A855F7] flex items-center justify-center shrink-0 animate-spin">
-                <Sparkles className="w-3.5 h-3.5" />
+            <div className="flex gap-2.5 items-center text-xs text-gray-400 font-mono py-1 animate-fade-in">
+              <div className="w-6 h-6 rounded-full bg-[#00F2FE]/20 text-[#00F2FE] flex items-center justify-center shrink-0">
+                <Sparkles className="w-3.5 h-3.5 animate-spin text-[#00F2FE]" />
               </div>
-              <span className="animate-pulse">ORB está formulando resposta técnica...</span>
+              <div className="flex items-center gap-2 bg-white/[0.04] border border-[#00F2FE]/20 px-3.5 py-1.5 rounded-full shadow-lg">
+                <span className="text-[#00F2FE] font-medium">Jeff está digitando</span>
+                <span className="flex gap-1 items-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00F2FE] animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#A855F7] animate-bounce" />
+                </span>
+              </div>
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
 
         {/* Quick Chips */}
-        <div className="px-4 py-2 border-t border-white/5 bg-[#080B11]/30 overflow-x-auto flex gap-1.5 no-scrollbar">
+        <div className="px-4 py-2 border-t border-white/5 bg-[#080B11]/30 flex flex-wrap gap-1.5 sm:gap-2 items-center">
           {QUICK_PROMPT_CHIPS.map((chip, idx) => (
             <button
               key={idx}
               onClick={() => sendMessage(chip)}
-              className="whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#00F2FE]/30 text-gray-300 transition-colors font-mono"
+              className="px-2.5 py-1 rounded-full text-[11px] bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#00F2FE]/30 text-gray-300 transition-colors font-mono"
             >
               {chip}
             </button>
@@ -250,7 +323,7 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            placeholder={isListening ? "Fale agora no microfone..." : "Pergunte algo ao ORB sobre o Jeferson..."}
+            placeholder={isListening ? "Fale agora no microfone..." : "Pergunte algo ao Jeff sobre o Jeferson..."}
             className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#00F2FE]/60"
           />
 

@@ -35,15 +35,15 @@ export const DEVELOPER_PROFILE = {
       label: "Controle de concorrência e transações atômicas no SaaS Django",
     },
     {
-      metric: "Custo Zero",
-      label: "Arquitetura otimizada para nuvem gratuita e alta escalabilidade",
+      metric: "Zero Downtime",
+      label: "Pipelines de CI/CD automatizados com Docker e deploy resiliente",
     },
   ],
 };
 
 export const CAREER_SYSTEM_PROMPT = `
-Você é o "ORB", o copiloto holográfico oficial do portfólio de engenharia de Jeferson Taveira.
-Seu tom é técnico, inteligente, assertivo e levemente bem-humorado (estilo Jarvis / assistente de alta tecnologia).
+Você é o "Jeff", o copiloto holográfico oficial de inteligência artificial do portfólio de Jeferson Taveira.
+Seu tom é técnico, inteligente, assertivo e levemente bem-humorado (estilo assistente de alta tecnologia).
 Você fala preferencialmente em Português do Brasil de forma clara e objetiva.
 
 DIRETRIZES FUNDAMENTAIS:
