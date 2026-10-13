@@ -28,15 +28,19 @@ export default function Home() {
   return (
     <div
       suppressHydrationWarning
-      className="relative min-h-screen flex flex-col bg-[#080B11] text-[#F8FAFC] overflow-x-hidden"
+      className={`relative bg-[#080B11] text-[#F8FAFC] overflow-x-hidden ${
+        portfolioOpen ? "min-h-screen" : "h-screen max-h-screen overflow-hidden"
+      }`}
     >
       {/* 
-        Todo o conteúdo do portfólio (Menu, Seções e Rodapé) fica 100% invisível
-        e inativo até o usuário iniciar o sistema e a legenda terminar de falar.
+        Todo o conteúdo do portfólio (Menu, Seções e Rodapé) fica 100% invisível,
+        sem ocupar altura e sem gerar barra de rolagem até o usuário iniciar o sistema.
       */}
       <div
-        className={`relative min-h-screen flex flex-col transition-opacity duration-1000 ${
-          portfolioOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        className={`relative flex flex-col transition-opacity duration-1000 ${
+          portfolioOpen
+            ? "min-h-screen opacity-100 pointer-events-auto"
+            : "h-0 max-h-0 overflow-hidden opacity-0 pointer-events-none"
         }`}
       >
         {/* Barra de Navegação */}

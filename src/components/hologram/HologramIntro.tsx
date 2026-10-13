@@ -67,11 +67,22 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
       setHologramVisible(true);
     }, 1400);
 
+    // Trava qualquer barra de rolagem no navegador enquanto a introdução estiver ativa
+    if (!isDocked) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+    } else {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    }
+
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
       window.removeEventListener("resize", updateDimensions);
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
     };
   }, [isDocked]);
 
