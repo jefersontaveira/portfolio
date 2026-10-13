@@ -202,32 +202,49 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
       if (dp < 0.99) {
         const beamAlpha = (1 - dp) * 0.22;
         const groundY = centerY + 155;
-        const beamGrad = ctx.createLinearGradient(centerX, groundY, centerX, centerY - 95);
-        beamGrad.addColorStop(0, `rgba(0, 242, 254, ${beamAlpha})`);
-        beamGrad.addColorStop(0.6, `rgba(0, 242, 254, ${beamAlpha * 0.3})`);
+        const beamGrad = ctx.createLinearGradient(centerX, groundY + 24, centerX, centerY - 95);
+        beamGrad.addColorStop(0, `rgba(0, 242, 254, ${beamAlpha * 1.5})`);
+        beamGrad.addColorStop(0.35, `rgba(0, 242, 254, ${beamAlpha * 0.8})`);
+        beamGrad.addColorStop(0.75, `rgba(0, 242, 254, ${beamAlpha * 0.2})`);
         beamGrad.addColorStop(1, "rgba(0, 242, 254, 0.0)");
 
+        // O feixe agora contorna a base inferior da elipse para preencher todo o campo inferior
         ctx.beginPath();
         ctx.moveTo(centerX - 120, groundY);
-        ctx.lineTo(centerX + 120, groundY);
+        ctx.ellipse(centerX, groundY, 120, 24, 0, Math.PI, 0, true);
         ctx.lineTo(centerX + 50, centerY - 100);
         ctx.lineTo(centerX - 50, centerY - 100);
         ctx.closePath();
         ctx.fillStyle = beamGrad;
         ctx.fill();
 
-        // 2. DISCO DE PROJEÇÃO NO CHÃO (Desaparece suavemente no modo docked)
-        const discAlpha = (1 - dp) * 0.4;
+        // 2. DISCO DE PROJEÇÃO NO CHÃO (Preenchido com brilho ciano-esmeralda)
+        const discAlpha = (1 - dp) * 0.45;
+
+        // Preenchimento luminoso da base do círculo
+        const floorGrad = ctx.createRadialGradient(
+          centerX, groundY, 4,
+          centerX, groundY, 120
+        );
+        floorGrad.addColorStop(0, `rgba(0, 242, 254, ${discAlpha * 0.75})`);
+        floorGrad.addColorStop(0.5, `rgba(0, 242, 254, ${discAlpha * 0.45})`);
+        floorGrad.addColorStop(1, `rgba(0, 242, 254, ${discAlpha * 0.15})`);
+
         ctx.beginPath();
         ctx.ellipse(centerX, groundY, 120, 24, 0, 0, Math.PI * 2);
+        ctx.fillStyle = floorGrad;
+        ctx.fill();
         ctx.strokeStyle = `rgba(0, 242, 254, ${discAlpha})`;
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
+        // Disco interno preenchido
         ctx.beginPath();
         ctx.ellipse(centerX, groundY, 70, 14, 0, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(0, 242, 254, ${discAlpha * 0.5})`;
-        ctx.lineWidth = 1;
+        ctx.fillStyle = `rgba(0, 242, 254, ${discAlpha * 0.35})`;
+        ctx.fill();
+        ctx.strokeStyle = `rgba(0, 242, 254, ${discAlpha * 0.85})`;
+        ctx.lineWidth = 1.2;
         ctx.stroke();
       }
 
