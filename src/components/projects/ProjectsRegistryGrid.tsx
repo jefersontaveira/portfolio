@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { 
   ProjectItem, 
   CATEGORIES, 
@@ -176,12 +177,18 @@ export const ProjectsRegistryGrid: React.FC = () => {
                   )}
                 </div>
 
-                {project.interactiveType && (
+                {project.id === "quickdraw-onnx-vision" ? (
+                  <Link
+                    href="/projetos/classificador-de-desenhos"
+                    className="text-xs font-mono font-medium text-[#00F2FE] hover:underline flex items-center gap-1"
+                  >
+                    <span>Testar Demo & Detalhes</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                ) : project.interactiveType ? (
                   <a
                     href={
-                      project.interactiveType === "onnx-vision"
-                        ? "#ia-lab"
-                        : project.interactiveType === "django-sandbox"
+                      project.interactiveType === "django-sandbox"
                         ? "#arena-saas"
                         : "#devops-cluster"
                     }
@@ -190,7 +197,7 @@ export const ProjectsRegistryGrid: React.FC = () => {
                     <span>Testar Demo</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </a>
-                )}
+                ) : null}
               </div>
             </div>
           ))}

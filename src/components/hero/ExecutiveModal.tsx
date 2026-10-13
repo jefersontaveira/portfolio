@@ -19,20 +19,44 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
   // Bloqueia a rolagem da página de fundo enquanto o modal estiver aberto
   useEffect(() => {
     if (isOpen) {
-      const originalBodyOverflow = document.body.style.overflow;
-      const originalHtmlOverflow = document.documentElement.style.overflow;
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
-
-      // Fechar modal ao pressionar tecla ESC
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Escape") onClose();
+      const handleWheel = (e: WheelEvent) => {
+        const target = e.target as HTMLElement | null;
+        const isInsideModalScroll = target?.closest(".overflow-y-auto");
+        if (!isInsideModalScroll) {
+          e.preventDefault();
+        }
       };
+
+      const handleTouchMove = (e: TouchEvent) => {
+        const target = e.target as HTMLElement | null;
+        const isInsideModalScroll = target?.closest(".overflow-y-auto");
+        if (!isInsideModalScroll) {
+          e.preventDefault();
+        }
+      };
+
+      // Fechar modal ao pressionar tecla ESC ou evitar rolagem da página por teclas
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          onClose();
+          return;
+        }
+        if (["Space", "PageUp", "PageDown"].includes(e.code)) {
+          const target = e.target as HTMLElement | null;
+          const isInsideModalScroll = target?.closest(".overflow-y-auto");
+          if (!isInsideModalScroll) {
+            e.preventDefault();
+          }
+        }
+      };
+
+      window.addEventListener("wheel", handleWheel, { passive: false });
+      window.addEventListener("touchmove", handleTouchMove, { passive: false });
       window.addEventListener("keydown", handleKeyDown);
 
       return () => {
-        document.body.style.overflow = originalBodyOverflow;
-        document.documentElement.style.overflow = originalHtmlOverflow;
+        window.removeEventListener("wheel", handleWheel);
+        window.removeEventListener("touchmove", handleTouchMove);
         window.removeEventListener("keydown", handleKeyDown);
       };
     }
@@ -48,11 +72,11 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overscroll-contain"
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-2xl bg-[#0F172A] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[90vh]"
+        className="relative w-full max-w-2xl bg-[#0F172A] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl overflow-y-auto overscroll-contain max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

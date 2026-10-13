@@ -44,6 +44,26 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [isRendered, setIsRendered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Animação de entrada e saída suave (Fade-In & Smooth Slide)
+  useEffect(() => {
+    let animTimer: NodeJS.Timeout;
+    if (isOpen) {
+      setIsRendered(true);
+      animTimer = setTimeout(() => {
+        setIsVisible(true);
+      }, 30);
+    } else {
+      setIsVisible(false);
+      animTimer = setTimeout(() => {
+        setIsRendered(false);
+      }, 350);
+    }
+    return () => clearTimeout(animTimer);
+  }, [isOpen]);
+
   // Limpeza de timers ao desmontar
   useEffect(() => {
     return () => {
@@ -58,22 +78,48 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
     }
   }, [initialQuery]);
 
-  // Bloqueia a rolagem da página ao fundo enquanto o chat do Jeff estiver aberto
+  // Bloqueia a rolagem do site ao fundo sem sumir com a barra lateral nem deslocar o layout
   useEffect(() => {
     if (isOpen) {
-      const originalBodyOverflow = document.body.style.overflow;
-      const originalHtmlOverflow = document.documentElement.style.overflow;
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
+      const handleWheel = (e: WheelEvent) => {
+        const target = e.target as HTMLElement | null;
+        // Permite rolagem apenas dentro da área de mensagens do chat
+        const isInsideChatScroll = target?.closest(".overflow-y-auto");
+        if (!isInsideChatScroll) {
+          e.preventDefault();
+        }
+      };
+
+      const handleTouchMove = (e: TouchEvent) => {
+        const target = e.target as HTMLElement | null;
+        const isInsideChatScroll = target?.closest(".overflow-y-auto");
+        if (!isInsideChatScroll) {
+          e.preventDefault();
+        }
+      };
 
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Escape") onClose();
+        if (e.key === "Escape") {
+          onClose();
+          return;
+        }
+        // Evita rolagem da página por teclas de navegação se não estiver digitando
+        if (["Space", "PageUp", "PageDown"].includes(e.code)) {
+          const target = e.target as HTMLElement | null;
+          const isInput = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
+          if (!isInput) {
+            e.preventDefault();
+          }
+        }
       };
+
+      window.addEventListener("wheel", handleWheel, { passive: false });
+      window.addEventListener("touchmove", handleTouchMove, { passive: false });
       window.addEventListener("keydown", handleKeyDown);
 
       return () => {
-        document.body.style.overflow = originalBodyOverflow;
-        document.documentElement.style.overflow = originalHtmlOverflow;
+        window.removeEventListener("wheel", handleWheel);
+        window.removeEventListener("touchmove", handleTouchMove);
         window.removeEventListener("keydown", handleKeyDown);
       };
     }
@@ -83,7 +129,7 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  if (!isOpen) return null;
+  if (!isRendered) return null;
 
   const handleSpeech = (text: string) => {
     SpeechManager.speak(text);
@@ -193,11 +239,15 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+      className={`fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overscroll-contain transition-opacity duration-500 ease-out ${
+        isVisible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-xl bg-[#0F172A] border border-[#00F2FE]/25 rounded-2xl shadow-[0_0_50px_rgba(0,242,254,0.15)] flex flex-col h-[78vh] sm:h-[590px] overflow-hidden mt-12 sm:mt-16"
+        className={`relative w-full max-w-xl bg-[#0F172A] border border-[#00F2FE]/25 rounded-2xl shadow-[0_0_60px_rgba(0,242,254,0.2)] flex flex-col h-[78vh] sm:h-[590px] overflow-hidden mt-12 sm:mt-16 transition-all duration-500 ease-out transform ${
+          isVisible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-4"
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Glow Superior de Ancoragem Holográfica */}
@@ -230,7 +280,7 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
         </div>
 
         {/* Message Log */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-3.5">
+        <div className="flex-1 p-4 overflow-y-auto overscroll-contain space-y-3.5">
           {messages.map((msg) => (
             <div
               key={msg.id}
@@ -289,18 +339,20 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Chips */}
-        <div className="px-4 py-2 border-t border-white/5 bg-[#080B11]/30 flex flex-wrap gap-1.5 sm:gap-2 items-center">
-          {QUICK_PROMPT_CHIPS.map((chip, idx) => (
-            <button
-              key={idx}
-              onClick={() => sendMessage(chip)}
-              className="px-2.5 py-1 rounded-full text-[11px] bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#00F2FE]/30 text-gray-300 transition-colors font-mono"
-            >
-              {chip}
-            </button>
-          ))}
-        </div>
+        {/* Sugestões de Perguntas Rápidas (Ocultas assim que o primeiro prompt é digitado ou enviado) */}
+        {!(messages.some((m) => m.sender === "user") || inputValue.trim().length > 0) && (
+          <div className="px-4 py-2 border-t border-white/5 bg-[#080B11]/30 flex flex-wrap gap-1.5 sm:gap-2 items-center animate-fade-in">
+            {QUICK_PROMPT_CHIPS.map((chip, idx) => (
+              <button
+                key={idx}
+                onClick={() => sendMessage(chip)}
+                className="px-2.5 py-1 rounded-full text-[11px] bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#00F2FE]/30 text-gray-300 transition-colors font-mono hover:text-white"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Input Bar */}
         <div className="p-3 border-t border-white/10 bg-[#080B11]/70 flex items-center gap-2">

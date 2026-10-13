@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Navbar } from "@/components/layout/Navbar";
 import { HeroSection } from "@/components/hero/HeroSection";
@@ -22,9 +22,41 @@ export default function Home() {
   const [portfolioOpen, setPortfolioOpen] = useState(false);
   const [isJeffVisible, setIsJeffVisible] = useState(true);
   const [isExecutiveModalOpen, setIsExecutiveModalOpen] = useState(false);
+  // Coordenação: o holograma viaja primeiro (850ms) e o modal só surge suavemente após ele pousar
+  const [isHologramAtChat, setIsHologramAtChat] = useState(false);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [voiceActive, setVoiceActive] = useState(false);
   const [initialChatQuery, setInitialChatQuery] = useState("");
+  const chatFlightTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Limpa timer se o componente for desmontado
+  useEffect(() => {
+    return () => {
+      if (chatFlightTimerRef.current) clearTimeout(chatFlightTimerRef.current);
+    };
+  }, []);
+
+  const handleOpenChat = (query?: string) => {
+    if (query) setInitialChatQuery(query);
+    setIsJeffVisible(true);
+
+    // 1. O holograma parte imediatamente em direção ao topo da posição do popup
+    setIsHologramAtChat(true);
+
+    if (chatFlightTimerRef.current) clearTimeout(chatFlightTimerRef.current);
+
+    // 2. O pop up só aparece suavemente quando o holograma atinge a posição exata
+    chatFlightTimerRef.current = setTimeout(() => {
+      setIsChatModalOpen(true);
+    }, 850);
+  };
+
+  const handleCloseChat = () => {
+    if (chatFlightTimerRef.current) clearTimeout(chatFlightTimerRef.current);
+    // Fecha o modal suavemente e retorna o holograma para a base do canto
+    setIsChatModalOpen(false);
+    setIsHologramAtChat(false);
+  };
 
   return (
     <div
@@ -72,7 +104,7 @@ export default function Home() {
             {/* Seção Hero */}
             <HeroSection
               onOpenExecutiveModal={() => setIsExecutiveModalOpen(true)}
-              onOpenChat={() => setIsChatModalOpen(true)}
+              onOpenChat={() => handleOpenChat()}
             />
 
             {/* Vitrine Modular de Projetos */}
@@ -90,15 +122,15 @@ export default function Home() {
       <HologramIntro
         isDocked={portfolioOpen}
         isJeffVisible={isJeffVisible}
-        isChatOpen={isChatModalOpen}
+        isChatOpen={isHologramAtChat}
         onEnterPortfolio={() => setPortfolioOpen(true)}
-        onOpenChat={() => setIsChatModalOpen(true)}
+        onOpenChat={() => handleOpenChat()}
       />
 
       {/* Modal de Conversa com a IA do Jeff */}
       <OrbChatModal
         isOpen={isChatModalOpen}
-        onClose={() => setIsChatModalOpen(false)}
+        onClose={handleCloseChat}
         initialQuery={initialChatQuery}
       />
 
