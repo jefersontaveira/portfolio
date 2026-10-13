@@ -33,8 +33,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className="dark scroll-smooth">
-      <body className="min-h-screen bg-[#080B11] text-[#F8FAFC] antialiased cyber-grid-bg selection:bg-[#00F2FE]/20 selection:text-[#00F2FE]">
+    <html lang="pt-BR" className="dark scroll-smooth" suppressHydrationWarning>
+      <body 
+        className="min-h-screen bg-[#080B11] text-[#F8FAFC] antialiased cyber-grid-bg selection:bg-[#00F2FE]/20 selection:text-[#00F2FE]"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>
