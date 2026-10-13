@@ -391,18 +391,18 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
   const isTablet = dimensions.width >= 640 && dimensions.width < 1024;
 
   // Tamanho do holograma no centro (Intro):
-  // No PC: amplo e imponente (até 660px); no mobile: cabe perfeitamente na largura (320px-340px)
+  // No PC: amplo e imponente (até 660px); no mobile: aumentado e imponente (até 440px / 94% da largura)
   const centralSize = isMobile
-    ? Math.min(dimensions.width - 32, 340)
+    ? Math.min(Math.round(dimensions.width * 0.94), Math.round(dimensions.height * 0.58), 440)
     : isTablet
-    ? Math.min(Math.round(dimensions.width * 0.7), Math.round(dimensions.height * 0.6), 500)
+    ? Math.min(Math.round(dimensions.width * 0.72), Math.round(dimensions.height * 0.62), 520)
     : Math.min(Math.round(dimensions.width * 0.55), Math.round(dimensions.height * 0.72), 660);
 
   // Tamanho no canto inferior direito (Docked):
   const dockedSize = isMobile
-    ? (dimensions.width < 380 ? 84 : 96)
+    ? (dimensions.width < 380 ? 94 : 108)
     : isTablet
-    ? 124
+    ? 130
     : 160;
 
   // Margem simétrica diagonal

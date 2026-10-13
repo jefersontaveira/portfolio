@@ -33,46 +33,46 @@ export default function Home() {
       }`}
     >
       {/* 
-        Todo o conteúdo do portfólio (Menu, Seções e Rodapé) fica 100% invisível,
-        sem ocupar altura e sem gerar barra de rolagem até o usuário iniciar o sistema.
+        Todo o conteúdo do portfólio (Menu, Seções e Rodapé) só é renderizado
+        quando o usuário inicia o sistema. Isso garante zero erro de hidratação
+        causado por extensões do navegador (como Dark Reader) e carrega a tela
+        holográfica de forma instantânea e limpa.
       */}
-      <div
-        className={`relative flex flex-col transition-opacity duration-1000 ${
-          portfolioOpen
-            ? "min-h-screen opacity-100 pointer-events-auto"
-            : "h-0 max-h-0 overflow-hidden opacity-0 pointer-events-none"
-        }`}
-      >
-        {/* Barra de Navegação */}
-        <Navbar
-          onOpenExecutiveModal={() => setIsExecutiveModalOpen(true)}
-          voiceActive={voiceActive}
-          onToggleVoice={() => setVoiceActive(!voiceActive)}
-          onReplayHologram={() => setPortfolioOpen(false)}
-        />
-
-        {/* Conteúdo Principal do Portfólio */}
-        <main className="flex-1">
-          {/* Seção Hero */}
-          <HeroSection
+      {portfolioOpen && (
+        <div
+          className="relative min-h-screen flex flex-col animate-fade-in"
+        >
+          {/* Barra de Navegação */}
+          <Navbar
             onOpenExecutiveModal={() => setIsExecutiveModalOpen(true)}
-            onOpenChat={() => setIsChatModalOpen(true)}
+            voiceActive={voiceActive}
+            onToggleVoice={() => setVoiceActive(!voiceActive)}
+            onReplayHologram={() => setPortfolioOpen(false)}
           />
 
-          {/* Vitrine Modular de Projetos */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <ProjectsRegistryGrid />
+          {/* Conteúdo Principal do Portfólio */}
+          <main className="flex-1">
+            {/* Seção Hero */}
+            <HeroSection
+              onOpenExecutiveModal={() => setIsExecutiveModalOpen(true)}
+              onOpenChat={() => setIsChatModalOpen(true)}
+            />
 
-            {/* Demos Interativas Flagship */}
-            <MlVisionLab />
-            <ArenaSaasSandbox />
-            <ContainerCluster />
-          </div>
-        </main>
+            {/* Vitrine Modular de Projetos */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <ProjectsRegistryGrid />
 
-        {/* Rodapé */}
-        <Footer />
-      </div>
+              {/* Demos Interativas Flagship */}
+              <MlVisionLab />
+              <ArenaSaasSandbox />
+              <ContainerCluster />
+            </div>
+          </main>
+
+          {/* Rodapé */}
+          <Footer />
+        </div>
+      )}
 
       {/* Holograma Interativo Permanente (Intro no Centro -> Transição Suave para Canto Inferior Direito) */}
       <HologramIntro
