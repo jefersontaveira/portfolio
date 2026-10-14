@@ -177,24 +177,22 @@ export const ProjectsRegistryGrid: React.FC = () => {
                   )}
                 </div>
 
-                {project.id === "quickdraw-onnx-vision" ? (
+                {project.liveUrl ? (
                   <Link
-                    href="/projetos/classificador-de-desenhos"
-                    className="text-xs font-mono font-medium text-[#00F2FE] hover:underline flex items-center gap-1"
+                    href={project.liveUrl}
+                    className="text-xs font-mono font-medium text-[#00F2FE] hover:underline flex items-center gap-1 group/btn"
                   >
                     <span>Testar Demo & Detalhes</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
+                    <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
                   </Link>
-                ) : project.interactiveType ? (
+                ) : project.githubUrl ? (
                   <a
-                    href={
-                      project.interactiveType === "django-sandbox"
-                        ? "#arena-saas"
-                        : "#devops-cluster"
-                    }
-                    className="text-xs font-mono font-medium text-[#00F2FE] hover:underline flex items-center gap-1"
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-mono font-medium text-gray-400 hover:text-white hover:underline flex items-center gap-1"
                   >
-                    <span>Testar Demo</span>
+                    <span>Ver Código</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </a>
                 ) : null}

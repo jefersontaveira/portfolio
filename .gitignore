@@ -33,3 +33,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# databases and secrets
+*.sqlite3
+*.sqlite3-journal
+projetos/**/db.sqlite3
+projetos/**/db_seed_clean.sqlite3
+projetos/**/.env
+

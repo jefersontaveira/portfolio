@@ -19,6 +19,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { SpeechManager } from "@/lib/speechHelper";
+import { getOnnxSession, runQuickDrawInference } from "@/lib/onnxInference";
 
 const CLASSES = [
   { name: "Carro", icon: "🚗", id: 0, desc: "Veículo automotor com rodas e chassi horizontal" },
@@ -41,6 +42,17 @@ export default function ClassificadorDesenhosPage() {
   const [hasDrawn, setHasDrawn] = useState(false);
   const [inferenceTime, setInferenceTime] = useState<string>("5ms");
   const [activeCodeTab, setActiveCodeTab] = useState<"model" | "train" | "dataset">("model");
+  const [brushSize, setBrushSize] = useState<number>(7);
+  const isInferringRef = useRef(false);
+  const pendingInferenceRef = useRef(false);
+
+  // Pré-carrega o modelo ONNX e inicializa o canvas
+  useEffect(() => {
+    getOnnxSession().catch((err: unknown) => {
+      console.warn("Pré-carregamento do modelo ONNX:", err);
+    });
+  }, []);
+
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -51,7 +63,7 @@ export default function ClassificadorDesenhosPage() {
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "#FFFFFF";
-    ctx.lineWidth = 14;
+    ctx.lineWidth = brushSize;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
@@ -63,7 +75,7 @@ export default function ClassificadorDesenhosPage() {
         pCtx.fillRect(0, 0, 28, 28);
       }
     }
-  }, []);
+  }, [brushSize]);
 
   const getCoordinates = (
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
@@ -71,19 +83,36 @@ export default function ClassificadorDesenhosPage() {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
     if ("touches" in e) {
       const touch = e.touches[0];
       return {
-        x: touch.clientX - rect.left,
-        y: touch.clientY - rect.top,
+        x: (touch.clientX - rect.left) * scaleX,
+        y: (touch.clientY - rect.top) * scaleY,
       };
     } else {
       return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY,
       };
     }
+  };
+
+  const triggerInference = () => {
+    if (isInferringRef.current) {
+      pendingInferenceRef.current = true;
+      return;
+    }
+    isInferringRef.current = true;
+    runInference().finally(() => {
+      isInferringRef.current = false;
+      if (pendingInferenceRef.current) {
+        pendingInferenceRef.current = false;
+        triggerInference();
+      }
+    });
   };
 
   const startDrawing = (
@@ -97,8 +126,16 @@ export default function ClassificadorDesenhosPage() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    ctx.lineWidth = brushSize;
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.fillStyle = "#FFFFFF";
+    ctx.beginPath();
+    ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+    ctx.fill();
     ctx.beginPath();
     ctx.moveTo(x, y);
+    triggerInference();
   };
 
   const draw = (
@@ -111,13 +148,16 @@ export default function ClassificadorDesenhosPage() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    ctx.lineWidth = brushSize;
+    ctx.strokeStyle = "#FFFFFF";
     ctx.lineTo(x, y);
     ctx.stroke();
-    runInference();
+    triggerInference();
   };
 
   const stopDrawing = () => {
     setIsDrawing(false);
+    triggerInference();
   };
 
   const clearCanvas = () => {
@@ -127,6 +167,8 @@ export default function ClassificadorDesenhosPage() {
     if (!ctx) return;
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.lineWidth = brushSize;
+    ctx.strokeStyle = "#FFFFFF";
     setHasDrawn(false);
     setPredictions([]);
 
@@ -140,8 +182,7 @@ export default function ClassificadorDesenhosPage() {
     }
   };
 
-  const runInference = () => {
-    const start = performance.now();
+  const runInference = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -155,16 +196,12 @@ export default function ClassificadorDesenhosPage() {
     let minY = canvas.height;
     let maxY = 0;
     let whitePixels = 0;
-    let sumX = 0;
-    let sumY = 0;
 
     for (let y = 0; y < canvas.height; y += 2) {
       for (let x = 0; x < canvas.width; x += 2) {
         const idx = (y * canvas.width + x) * 4;
-        if (data[idx] > 80) {
+        if (data[idx] > 40) {
           whitePixels++;
-          sumX += x;
-          sumY += y;
           if (x < minX) minX = x;
           if (x > maxX) maxX = x;
           if (y < minY) minY = y;
@@ -173,116 +210,88 @@ export default function ClassificadorDesenhosPage() {
       }
     }
 
-    if (whitePixels < 25 || maxX <= minX || maxY <= minY) {
+    if (whitePixels < 12 || maxX <= minX || maxY <= minY) {
       setPredictions([]);
       return;
     }
 
-    const boxW = Math.max(1, maxX - minX);
-    const boxH = Math.max(1, maxY - minY);
-    const aspectRatio = boxW / boxH;
-    const centerY = sumY / whitePixels;
-    const relCenterY = (centerY - minY) / boxH;
+    const boxW = Math.max(1, maxX - minX + 1);
+    const boxH = Math.max(1, maxY - minY + 1);
+    const maxDim = Math.max(boxW, boxH);
 
-    let topThirdPixels = 0;
-    let midThirdPixels = 0;
-    let bottomThirdPixels = 0;
-    let leftHalfPixels = 0;
-    let rightHalfPixels = 0;
-
-    for (let y = minY; y <= maxY; y += 3) {
-      for (let x = minX; x <= maxX; x += 3) {
-        const idx = (y * canvas.width + x) * 4;
-        if (data[idx] > 80) {
-          const normY = (y - minY) / boxH;
-          if (normY < 0.35) topThirdPixels++;
-          else if (normY < 0.65) midThirdPixels++;
-          else bottomThirdPixels++;
-
-          if (x < minX + boxW / 2) leftHalfPixels++;
-          else rightHalfPixels++;
-        }
-      }
-    }
+    // Margem de 2px para centralizar dentro da matriz 28x28 com proporções idênticas ao dataset
+    const availableSize = 24;
+    const scale = availableSize / Math.max(maxDim, 1);
+    const targetW = Math.max(1, Math.round(boxW * scale));
+    const targetH = Math.max(1, Math.round(boxH * scale));
+    const startX = Math.round((28 - targetW) / 2);
+    const startY = Math.round((28 - targetH) / 2);
 
     const pCanvas = previewCanvasRef.current;
-    if (pCanvas) {
-      const pCtx = pCanvas.getContext("2d");
-      if (pCtx) {
-        pCtx.fillStyle = "#000000";
-        pCtx.fillRect(0, 0, 28, 28);
-        pCtx.drawImage(canvas, minX, minY, boxW, boxH, 2, 2, 24, 24);
+    if (!pCanvas) return;
+    const pCtx = pCanvas.getContext("2d");
+    if (!pCtx) return;
+
+    pCtx.imageSmoothingEnabled = true;
+    pCtx.imageSmoothingQuality = "high";
+    pCtx.fillStyle = "#000000";
+    pCtx.fillRect(0, 0, 28, 28);
+    pCtx.drawImage(canvas, minX, minY, boxW, boxH, startX, startY, targetW, targetH);
+
+
+    const pImgData = pCtx.getImageData(0, 0, 28, 28);
+    const rawData = new Float32Array(28 * 28);
+
+    // Encontra valor máximo para normalização de contraste
+    let maxVal = 0;
+    for (let i = 0; i < 28 * 28; i++) {
+      const v = pImgData.data[i * 4];
+      if (v > maxVal) maxVal = v;
+      rawData[i] = v;
+    }
+
+    const normFactor = maxVal > 0 ? 1.0 / maxVal : 1.0;
+    for (let i = 0; i < 28 * 28; i++) {
+      rawData[i] *= normFactor;
+    }
+
+    // Dilatação morfológica 3x3 suave (reproduz ImageFilter.MaxFilter(5) do app.py original)
+    // Garante que o traço encolhido preencha 2 a 3 pixels de largura na resolução do QuickDraw
+    const floatData = new Float32Array(28 * 28);
+    for (let y = 0; y < 28; y++) {
+      for (let x = 0; x < 28; x++) {
+        let maxNeighborhood = 0;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            const ny = y + dy;
+            const nx = x + dx;
+            if (ny >= 0 && ny < 28 && nx >= 0 && nx < 28) {
+              const val = rawData[ny * 28 + nx];
+              if (val > maxNeighborhood) maxNeighborhood = val;
+            }
+          }
+        }
+        floatData[y * 28 + x] = maxNeighborhood;
       }
     }
 
-    const scores: Record<string, number> = {
-      Carro: 15,
-      Avião: 15,
-      Maçã: 15,
-      Gato: 15,
-      Peixe: 15,
-      Estrela: 15,
-      Árvore: 15,
-      "Guarda-chuva": 15,
-    };
-
-    if (aspectRatio > 1.35) {
-      scores["Carro"] += 45;
-      scores["Peixe"] += 35;
-      scores["Avião"] += 30;
-      if (bottomThirdPixels > topThirdPixels) {
-        scores["Carro"] += 25;
-      }
-      if (Math.abs(leftHalfPixels - rightHalfPixels) > (leftHalfPixels + rightHalfPixels) * 0.2) {
-        scores["Peixe"] += 25;
-      }
+    // Atualiza a visualização do tensor 28x28 para exibir exatamente o que a CNN processa
+    for (let i = 0; i < 28 * 28; i++) {
+      const pxVal = Math.round(floatData[i] * 255);
+      pImgData.data[i * 4] = pxVal;
+      pImgData.data[i * 4 + 1] = pxVal;
+      pImgData.data[i * 4 + 2] = pxVal;
+      pImgData.data[i * 4 + 3] = 255;
     }
+    pCtx.putImageData(pImgData, 0, 0);
 
-    if (aspectRatio < 0.85) {
-      scores["Árvore"] += 45;
-      scores["Guarda-chuva"] += 35;
-      if (topThirdPixels > bottomThirdPixels * 1.25) {
-        scores["Árvore"] += 35;
-      }
-      if (relCenterY < 0.45) {
-        scores["Guarda-chuva"] += 25;
-      }
+    try {
+      const { predictions: ranked, inferenceTimeMs } = await runQuickDrawInference(floatData);
+      setInferenceTime(`${inferenceTimeMs}ms`);
+      setPredictions(ranked.slice(0, 4));
+    } catch (err) {
+      console.error("Erro na inferência neural:", err);
     }
-
-    if (aspectRatio >= 0.85 && aspectRatio <= 1.35) {
-      scores["Maçã"] += 40;
-      scores["Estrela"] += 35;
-      scores["Gato"] += 25;
-      if (topThirdPixels > 0 && bottomThirdPixels > topThirdPixels) {
-        scores["Maçã"] += 20;
-      }
-      if (midThirdPixels > topThirdPixels && midThirdPixels > bottomThirdPixels) {
-        scores["Estrela"] += 25;
-      }
-    }
-
-    const classResults = CLASSES.map((c) => ({
-      name: c.name,
-      icon: c.icon,
-      rawScore: scores[c.name] || 10,
-    }));
-
-    const totalRaw = classResults.reduce((acc, curr) => acc + curr.rawScore, 0);
-    const ranked = classResults
-      .map((item) => ({
-        name: item.name,
-        icon: item.icon,
-        score: Math.min(96, Math.max(4, Math.round((item.rawScore / totalRaw) * 100))),
-      }))
-      .sort((a, b) => b.score - a.score);
-
-    if (ranked.length > 0) {
-      ranked[0].score = Math.max(85, ranked[0].score);
-    }
-
-    const end = performance.now();
-    setInferenceTime(`${Math.max(4, Math.round(end - start))}ms`);
-    setPredictions(ranked.slice(0, 4));
   };
 
   const handleVoiceNarration = () => {
@@ -393,18 +402,50 @@ export default function ClassificadorDesenhosPage() {
           </div>
 
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Coluna do Canvas */}
-            <div className="lg:col-span-5 flex flex-col items-center">
-              <div className="w-full flex items-center justify-between text-xs text-gray-400 mb-2 font-mono">
-                <span>Quadro de Desenho:</span>
+            {/* Coluna do Canvas Expandido */}
+            <div className="lg:col-span-6 flex flex-col items-center">
+              <div className="w-full max-w-[420px] flex items-center justify-between text-xs text-gray-400 mb-2.5 font-mono">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#00F2FE] animate-pulse" />
+                  <span>Quadro de Desenho (420x420px)</span>
+                </span>
                 <span className="text-[#00F2FE]">Mouse & Touch Ativos</span>
               </div>
 
-              <div className="relative border-2 border-[#00F2FE]/40 rounded-2xl overflow-hidden bg-black shadow-[0_0_30px_rgba(0,242,254,0.15)]">
+              {/* Seletor de Espessura do Pincel */}
+              <div className="w-full max-w-[420px] mb-3 flex items-center justify-between p-1.5 rounded-xl bg-white/[0.04] border border-white/10">
+                <span className="text-[11px] font-mono text-gray-400 pl-2">Espessura da linha:</span>
+                <div className="flex items-center gap-1">
+                  {[
+                    { label: "Fina", size: 4, dotSize: 3 },
+                    { label: "Média (Padrão)", size: 7, dotSize: 6 },
+                    { label: "Firme", size: 11, dotSize: 9 },
+                  ].map((opt) => (
+                    <button
+                      key={opt.size}
+                      type="button"
+                      onClick={() => setBrushSize(opt.size)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+                        brushSize === opt.size
+                          ? "bg-[#00F2FE] text-black font-bold shadow-[0_0_12px_rgba(0,242,254,0.4)]"
+                          : "text-gray-400 hover:text-white hover:bg-white/5"
+                      }`}
+                    >
+                      <span
+                        className="rounded-full bg-current block"
+                        style={{ width: opt.dotSize, height: opt.dotSize }}
+                      />
+                      <span>{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative w-full max-w-[420px] aspect-square border-2 border-[#00F2FE]/40 rounded-2xl overflow-hidden bg-black shadow-[0_0_35px_rgba(0,242,254,0.18)]">
                 <canvas
                   ref={canvasRef}
-                  width={280}
-                  height={280}
+                  width={420}
+                  height={420}
                   onMouseDown={startDrawing}
                   onMouseMove={draw}
                   onMouseUp={stopDrawing}
@@ -412,45 +453,49 @@ export default function ClassificadorDesenhosPage() {
                   onTouchStart={startDrawing}
                   onTouchMove={draw}
                   onTouchEnd={stopDrawing}
-                  className="touch-canvas cursor-crosshair block"
+                  className="touch-canvas cursor-crosshair block w-full h-full"
                   style={{ touchAction: "none" }}
                 />
 
                 {!hasDrawn && (
-                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-center p-4">
-                    <p className="text-xs text-gray-500 font-mono leading-relaxed">
-                      Desenhe um carro, avião, maçã, gato, peixe, estrela, árvore ou guarda-chuva...
+                  <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center text-center p-6">
+                    <p className="text-sm font-medium text-gray-300 font-mono leading-relaxed">
+                      Área de desenho expandida
+                    </p>
+                    <p className="text-xs text-gray-500 font-mono mt-2 max-w-[280px]">
+                      Desenhe livremente: carro, avião, maçã, gato, peixe, estrela, árvore ou guarda-chuva...
                     </p>
                   </div>
                 )}
               </div>
 
               {/* Botões do Canvas */}
-              <div className="mt-3 flex items-center gap-3 w-full max-w-[280px]">
+              <div className="mt-3.5 flex items-center gap-3 w-full max-w-[420px]">
                 <button
                   onClick={clearCanvas}
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-300 text-xs font-mono flex items-center justify-center gap-1.5 transition-colors"
+                  className="flex-1 py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-200 hover:text-white text-xs font-mono font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Limpar Tela</span>
                 </button>
                 <button
                   onClick={handleVoiceNarration}
-                  className="p-2.5 rounded-xl bg-[#00F2FE]/15 hover:bg-[#00F2FE]/25 border border-[#00F2FE]/40 text-[#00F2FE] transition-colors"
+                  className="p-2.5 px-3.5 rounded-xl bg-[#00F2FE]/15 hover:bg-[#00F2FE]/25 border border-[#00F2FE]/40 text-[#00F2FE] text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
                   title="Ouvir predição por voz"
                 >
                   <Volume2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Ouvir Voz</span>
                 </button>
               </div>
 
               {/* HUD do Tensor 28x28 */}
-              <div className="mt-3 w-full max-w-[280px] flex items-center justify-between p-3 rounded-xl bg-[#080B11]/90 border border-[#00F2FE]/25">
+              <div className="mt-3.5 w-full max-w-[420px] flex items-center justify-between p-3.5 rounded-xl bg-[#080B11]/90 border border-[#00F2FE]/25">
                 <div className="flex items-center gap-2.5">
                   <canvas
                     ref={previewCanvasRef}
                     width={28}
                     height={28}
-                    className="w-8 h-8 rounded border border-[#00F2FE]/60 bg-black block shrink-0"
+                    className="w-9 h-9 rounded-md border border-[#00F2FE]/60 bg-black block shrink-0 shadow-[0_0_10px_rgba(0,242,254,0.25)]"
                     style={{ imageRendering: "pixelated" }}
                   />
                   <div>
@@ -466,7 +511,7 @@ export default function ClassificadorDesenhosPage() {
             </div>
 
             {/* Coluna das Predições */}
-            <div className="lg:col-span-7 flex flex-col justify-between h-full bg-[#080B11]/70 p-6 rounded-2xl border border-white/10">
+            <div className="lg:col-span-6 flex flex-col justify-between h-full bg-[#080B11]/70 p-6 sm:p-7 rounded-2xl border border-white/10">
               <div>
                 <div className="flex items-center justify-between pb-3 border-b border-white/10">
                   <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Distribuição Softmax de Probabilidades</span>

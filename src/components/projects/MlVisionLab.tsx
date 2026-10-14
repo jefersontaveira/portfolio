@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Sparkles, RotateCcw, Cpu, Code2, Check, AlertCircle, Volume2 } from "lucide-react";
 import { SpeechManager } from "@/lib/speechHelper";
+import { getOnnxSession, runQuickDrawInference } from "@/lib/onnxInference";
 
 const CLASSES = [
   { name: "Carro", icon: "🚗", id: 0 },
@@ -25,6 +26,13 @@ export const MlVisionLab: React.FC = () => {
   const [hasDrawn, setHasDrawn] = useState(false);
   const [activeTab, setActiveTab] = useState<"interactive" | "pythonCode">("interactive");
   const [inferenceTime, setInferenceTime] = useState<string>("6ms");
+  const isInferringRef = useRef(false);
+  const pendingInferenceRef = useRef(false);
+
+  useEffect(() => {
+    getOnnxSession().catch((err: unknown) => console.warn("Pré-carregamento ONNX:", err));
+  }, []);
+
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -36,7 +44,7 @@ export const MlVisionLab: React.FC = () => {
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "#FFFFFF";
-    ctx.lineWidth = 14;
+    ctx.lineWidth = 10;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
@@ -58,19 +66,36 @@ export const MlVisionLab: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
     if ("touches" in e) {
       const touch = e.touches[0];
       return {
-        x: touch.clientX - rect.left,
-        y: touch.clientY - rect.top,
+        x: (touch.clientX - rect.left) * scaleX,
+        y: (touch.clientY - rect.top) * scaleY,
       };
     } else {
       return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY,
       };
     }
+  };
+
+  const triggerInference = () => {
+    if (isInferringRef.current) {
+      pendingInferenceRef.current = true;
+      return;
+    }
+    isInferringRef.current = true;
+    runInference().finally(() => {
+      isInferringRef.current = false;
+      if (pendingInferenceRef.current) {
+        pendingInferenceRef.current = false;
+        triggerInference();
+      }
+    });
   };
 
   const startDrawing = (
@@ -85,7 +110,12 @@ export const MlVisionLab: React.FC = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fill();
+    ctx.beginPath();
     ctx.moveTo(x, y);
+    triggerInference();
   };
 
   const draw = (
@@ -100,11 +130,12 @@ export const MlVisionLab: React.FC = () => {
     if (!ctx) return;
     ctx.lineTo(x, y);
     ctx.stroke();
-    runInference();
+    triggerInference();
   };
 
   const stopDrawing = () => {
     setIsDrawing(false);
+    triggerInference();
   };
 
   const clearCanvas = () => {
@@ -127,9 +158,8 @@ export const MlVisionLab: React.FC = () => {
     }
   };
 
-  // Motor de Inferência Neural no Cliente (análise morfológica e extração de características)
-  const runInference = () => {
-    const start = performance.now();
+  // Motor de Inferência Neural no Cliente com modelo ONNX real exportado do PyTorch
+  const runInference = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -143,17 +173,12 @@ export const MlVisionLab: React.FC = () => {
     let minY = canvas.height;
     let maxY = 0;
     let whitePixels = 0;
-    let sumX = 0;
-    let sumY = 0;
 
-    // Amostragem para encontrar bounding box e centro de massa
     for (let y = 0; y < canvas.height; y += 2) {
       for (let x = 0; x < canvas.width; x += 2) {
         const idx = (y * canvas.width + x) * 4;
-        if (data[idx] > 80) {
+        if (data[idx] > 40) {
           whitePixels++;
-          sumX += x;
-          sumY += y;
           if (x < minX) minX = x;
           if (x > maxX) maxX = x;
           if (y < minY) minY = y;
@@ -162,124 +187,83 @@ export const MlVisionLab: React.FC = () => {
       }
     }
 
-    if (whitePixels < 25 || maxX <= minX || maxY <= minY) {
+    if (whitePixels < 12 || maxX <= minX || maxY <= minY) {
       setPredictions([]);
       return;
     }
 
-    const boxW = Math.max(1, maxX - minX);
-    const boxH = Math.max(1, maxY - minY);
-    const aspectRatio = boxW / boxH;
-    const centerY = sumY / whitePixels;
-    const relCenterY = (centerY - minY) / boxH;
+    const boxW = Math.max(1, maxX - minX + 1);
+    const boxH = Math.max(1, maxY - minY + 1);
+    const maxDim = Math.max(boxW, boxH);
 
-    // Contagem de massa no terço superior vs terço inferior
-    let topThirdPixels = 0;
-    let midThirdPixels = 0;
-    let bottomThirdPixels = 0;
-    let leftHalfPixels = 0;
-    let rightHalfPixels = 0;
+    const availableSize = 24;
+    const scale = availableSize / Math.max(maxDim, 1);
+    const targetW = Math.max(1, Math.round(boxW * scale));
+    const targetH = Math.max(1, Math.round(boxH * scale));
+    const startX = Math.round((28 - targetW) / 2);
+    const startY = Math.round((28 - targetH) / 2);
 
-    for (let y = minY; y <= maxY; y += 3) {
-      for (let x = minX; x <= maxX; x += 3) {
-        const idx = (y * canvas.width + x) * 4;
-        if (data[idx] > 80) {
-          const normY = (y - minY) / boxH;
-          if (normY < 0.35) topThirdPixels++;
-          else if (normY < 0.65) midThirdPixels++;
-          else bottomThirdPixels++;
-
-          if (x < minX + boxW / 2) leftHalfPixels++;
-          else rightHalfPixels++;
-        }
-      }
-    }
-
-    // Renderiza a miniatura 28x28 (idêntico ao pré-processamento do Quick, Draw!)
     const pCanvas = previewCanvasRef.current;
-    if (pCanvas) {
-      const pCtx = pCanvas.getContext("2d");
-      if (pCtx) {
-        pCtx.fillStyle = "#000000";
-        pCtx.fillRect(0, 0, 28, 28);
-        pCtx.drawImage(canvas, minX, minY, boxW, boxH, 2, 2, 24, 24);
+    if (!pCanvas) return;
+    const pCtx = pCanvas.getContext("2d");
+    if (!pCtx) return;
+
+    pCtx.imageSmoothingEnabled = true;
+    pCtx.imageSmoothingQuality = "high";
+    pCtx.fillStyle = "#000000";
+    pCtx.fillRect(0, 0, 28, 28);
+    pCtx.drawImage(canvas, minX, minY, boxW, boxH, startX, startY, targetW, targetH);
+
+
+    const pImgData = pCtx.getImageData(0, 0, 28, 28);
+    const rawData = new Float32Array(28 * 28);
+
+    let maxVal = 0;
+    for (let i = 0; i < 28 * 28; i++) {
+      const v = pImgData.data[i * 4];
+      if (v > maxVal) maxVal = v;
+      rawData[i] = v;
+    }
+
+    const normFactor = maxVal > 0 ? 1.0 / maxVal : 1.0;
+    for (let i = 0; i < 28 * 28; i++) {
+      rawData[i] *= normFactor;
+    }
+
+    const floatData = new Float32Array(28 * 28);
+    for (let y = 0; y < 28; y++) {
+      for (let x = 0; x < 28; x++) {
+        let maxNeighborhood = 0;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            const ny = y + dy;
+            const nx = x + dx;
+            if (ny >= 0 && ny < 28 && nx >= 0 && nx < 28) {
+              const val = rawData[ny * 28 + nx];
+              if (val > maxNeighborhood) maxNeighborhood = val;
+            }
+          }
+        }
+        floatData[y * 28 + x] = maxNeighborhood;
       }
     }
 
-    // Pontuação morfológica baseada nas 8 classes treinadas
-    const scores: Record<string, number> = {
-      Carro: 15,
-      Avião: 15,
-      Maçã: 15,
-      Gato: 15,
-      Peixe: 15,
-      Estrela: 15,
-      Árvore: 15,
-      "Guarda-chuva": 15,
-    };
-
-    // 1. Formatos horizontais (Largura consideravelmente maior que Altura)
-    if (aspectRatio > 1.35) {
-      scores["Carro"] += 45;
-      scores["Peixe"] += 35;
-      scores["Avião"] += 30;
-      if (bottomThirdPixels > topThirdPixels) {
-        scores["Carro"] += 25; // base mais densa com rodas
-      }
-      if (Math.abs(leftHalfPixels - rightHalfPixels) > (leftHalfPixels + rightHalfPixels) * 0.2) {
-        scores["Peixe"] += 25; // assimetria de cauda
-      }
+    for (let i = 0; i < 28 * 28; i++) {
+      const pxVal = Math.round(floatData[i] * 255);
+      pImgData.data[i * 4] = pxVal;
+      pImgData.data[i * 4 + 1] = pxVal;
+      pImgData.data[i * 4 + 2] = pxVal;
+      pImgData.data[i * 4 + 3] = 255;
     }
+    pCtx.putImageData(pImgData, 0, 0);
 
-    // 2. Formatos verticais (Altura consideravelmente maior que Largura)
-    if (aspectRatio < 0.85) {
-      scores["Árvore"] += 45;
-      scores["Guarda-chuva"] += 35;
-      if (topThirdPixels > bottomThirdPixels * 1.25) {
-        scores["Árvore"] += 35; // copa larga no topo, tronco estreito embaixo
-      }
-      if (relCenterY < 0.45) {
-        scores["Guarda-chuva"] += 25; // cúpula superior
-      }
+    try {
+      const { predictions: ranked, inferenceTimeMs } = await runQuickDrawInference(floatData);
+      setInferenceTime(`${inferenceTimeMs}ms`);
+      setPredictions(ranked.slice(0, 4));
+    } catch (err) {
+      console.error("Erro na inferência neural:", err);
     }
-
-    // 3. Formatos equilibrados (Próximos de 1:1)
-    if (aspectRatio >= 0.85 && aspectRatio <= 1.35) {
-      scores["Maçã"] += 40;
-      scores["Estrela"] += 35;
-      scores["Gato"] += 25;
-      if (topThirdPixels > 0 && bottomThirdPixels > topThirdPixels) {
-        scores["Maçã"] += 20; // corpo arredondado
-      }
-      if (midThirdPixels > topThirdPixels && midThirdPixels > bottomThirdPixels) {
-        scores["Estrela"] += 25; // centro irradiando pontas
-      }
-    }
-
-    // Normalização Softmax
-    const classResults = CLASSES.map((c) => ({
-      name: c.name,
-      icon: c.icon,
-      rawScore: scores[c.name] || 10,
-    }));
-
-    const totalRaw = classResults.reduce((acc, curr) => acc + curr.rawScore, 0);
-    const ranked = classResults
-      .map((item) => ({
-        name: item.name,
-        icon: item.icon,
-        score: Math.min(96, Math.max(4, Math.round((item.rawScore / totalRaw) * 100))),
-      }))
-      .sort((a, b) => b.score - a.score);
-
-    // Destaque visual realista para a classe Top 1
-    if (ranked.length > 0) {
-      ranked[0].score = Math.max(84, ranked[0].score);
-    }
-
-    const end = performance.now();
-    setInferenceTime(`${Math.max(4, Math.round(end - start))}ms`);
-    setPredictions(ranked.slice(0, 4));
   };
 
   const handleVoiceNarration = () => {

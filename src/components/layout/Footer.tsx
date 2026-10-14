@@ -19,14 +19,20 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <a
-            href={DEVELOPER_PROFILE.contact.github}
+            href={DEVELOPER_PROFILE.contact.whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-white transition-colors"
+            className="hover:text-[#25D366] transition-colors"
           >
-            GitHub
+            WhatsApp
+          </a>
+          <a
+            href={DEVELOPER_PROFILE.contact.email ? `mailto:${DEVELOPER_PROFILE.contact.email}` : "#contato"}
+            className="hover:text-[#00F2FE] transition-colors"
+          >
+            E-mail
           </a>
           <a
             href={DEVELOPER_PROFILE.contact.linkedin}
@@ -37,12 +43,23 @@ export const Footer: React.FC = () => {
             LinkedIn
           </a>
           <a
-            href={`mailto:${DEVELOPER_PROFILE.contact.email}`}
-            className="hover:text-[#00F2FE] transition-colors"
+            href={DEVELOPER_PROFILE.contact.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition-colors"
           >
-            Contato Direto
+            GitHub
+          </a>
+          <a
+            href={DEVELOPER_PROFILE.contact.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#E1306C] transition-colors"
+          >
+            Instagram
           </a>
         </div>
+
 
         <div className="text-gray-400 flex items-center gap-1">
           <span>Construído com Python, Next.js & IA</span>

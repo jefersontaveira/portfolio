@@ -54,7 +54,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           <a href="#projetos" className="hover:text-[#00F2FE] transition-colors">
             Projetos
           </a>
+          <a href="#sobre" className="hover:text-[#00F2FE] transition-colors">
+            Sobre
+          </a>
+          <a href="#contato" className="hover:text-[#00F2FE] transition-colors font-medium">
+            Contato
+          </a>
         </nav>
+
+
 
         {/* Action Controls */}
         <div className="hidden sm:flex items-center gap-2.5">
@@ -133,7 +141,23 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               Projetos
             </a>
+            <a
+              href="#sobre"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#00F2FE]"
+            >
+              Sobre
+            </a>
+            <a
+              href="#contato"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#00F2FE]"
+            >
+              Contato
+            </a>
           </div>
+
+
 
           <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
             <button

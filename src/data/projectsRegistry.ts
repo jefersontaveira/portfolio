@@ -98,51 +98,77 @@ class QuickDrawCNN(nn.Module):
   {
     id: "arena-saas-django",
     title: "SaaS de Gestão de Arenas Esportivas",
-    tagline: "Ecossistema multi-quadras com motor anti-overbooking e concorrência transacional",
+    tagline: "Ecossistema multi-tenant com motor de preços, gestão de escolinha e pagamentos Pix Asaas",
     description: 
-      "Plataforma completa para gestão de centros esportivos (Beach Tennis, Padel, Futsal). Desenvolvido em Django REST Framework com PostgreSQL, autenticação JWT, controle de lock transacional para agendamentos simultâneos e dashboard financeiro em tempo real.",
+      "Plataforma completa para gestão de centros esportivos (Beach Tennis, Padel, Vôlei e Futsal). Desenvolvido em Django 4.2 com arquitetura multi-tenant robusta, portal público personalizável do atleta, gestão completa de escolinhas esportivas (turmas, matrículas e mensalidades), motor dinâmico de tarifação de quadras e checkout Pix automatizado com conciliação via Asaas.",
     category: "fullstack-python",
     categoryLabel: "Python & Django",
-    technologies: ["Python 3.12", "Django REST Framework", "PostgreSQL", "Redis", "JWT", "React", "Docker"],
-    githubUrl: "https://github.com/jeferson-taveira/arena-saas",
+    technologies: ["Python 3.11", "Django 4.2 LTS", "Multi-Tenant", "Asaas Pix & Webhooks", "Gestão de Escolinha", "Site Customizável", "SQLite/Postgres", "Jazzmin Admin"],
+    githubUrl: "https://github.com/jefersontaveira/Sistema-de-Agenda-para-Arenas.git",
+    liveUrl: "/projetos/sistema-de-agenda-para-arenas",
     featured: true,
     accentColor: "#A855F7",
     interactiveType: "django-sandbox",
     stats: [
-      { label: "Tempo de Resposta", value: "48ms" },
-      { label: "Controle de Concorrência", value: "Pessimistic Lock" },
-      { label: "Disponibilidade", value: "99.9%" },
+      { label: "Tempo de Resposta", value: "28ms" },
+      { label: "Arquitetura", value: "Multi-Tenant" },
+      { label: "Módulo Escolinha", value: "Completo" },
+      { label: "Checkout Pix", value: "Asaas Subcontas" },
     ],
     pythonSnippets: [
       {
-        title: "services/booking.py (Django Atomic Booking)",
+        title: "backoffice/models.py (Motor de Preço Dinâmico)",
         language: "python",
-        code: `from django.db import transaction
-from rest_framework.exceptions import ValidationError
-from .models import Agendamento, Quadra
+        code: `@classmethod
+def get_price_for_booking(cls, arena, court, start_datetime):
+    """
+    Calcula o preço da reserva verificando cascata de prioridades:
+    1. Regra Específica da Quadra (Horário Nobre)
+    2. Regra Geral da Arena por Dia da Semana
+    3. Preço Padrão da Quadra
+    4. Preço Padrão da Arena
+    """
+    if timezone.is_aware(start_datetime):
+        start_datetime = timezone.localtime(start_datetime)
 
-@transaction.atomic
-def criar_agendamento(quadra_id, data_hora_inicio, data_hora_fim, cliente):
-    # Lock pessimista na quadra para evitar condição de corrida
-    quadra = Quadra.objects.select_for_update().get(id=quadra_id)
-    
-    conflito = Agendamento.objects.filter(
-        quadra=quadra,
-        status='CONFIRMADO',
-        data_hora_inicio__lt=data_hora_fim,
-        data_hora_fim__gt=data_hora_inicio
-    ).exists()
-    
-    if conflito:
-        raise ValidationError({"error": "Horário indisponível. Conflito de agenda detectado."})
-        
-    return Agendamento.objects.create(
-        quadra=quadra,
-        cliente=cliente,
-        data_hora_inicio=data_hora_inicio,
-        data_hora_fim=data_hora_fim,
-        status='CONFIRMADO'
-    )`
+    weekday = start_datetime.weekday()
+    time = start_datetime.time()
+
+    rules = cls.objects.filter(
+        arena=arena,
+        days__number=weekday,
+        start_time__lte=time,
+        end_time__gt=time
+    ).prefetch_related('days')
+
+    court_rule = rules.filter(court=court).first()
+    arena_rule = rules.filter(court__isnull=True).first()
+
+    if court_rule:
+        return court_rule.price
+    elif arena_rule:
+        return arena_rule.price
+    elif court.price > 0:
+        return court.price
+    return arena.config.default_price`
+      },
+      {
+        title: "backoffice/models.py (Prevenção Anti-Colisão Concorrente)",
+        language: "python",
+        code: `def clean(self):
+    # Previne overbooking concorrente em tempo real
+    if not self.court_id or not self.start_time or not self.end_time:
+        return
+
+    collision = Booking.objects.filter(
+        court=self.court,
+        status__in=['PENDING', 'CONFIRMED'],
+        start_time__lt=self.end_time,
+        end_time__gt=self.start_time
+    ).exclude(pk=self.pk)
+
+    if collision.exists():
+        raise ValidationError("Já existe uma reserva para esta quadra neste horário!")`
       }
     ]
   },

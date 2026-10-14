@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Play } from "lucide-react";
 import { SpeechManager } from "@/lib/speechHelper";
+import { isPortfolioInitialized } from "@/lib/portfolioSession";
+
 
 interface HologramIntroProps {
   isDocked?: boolean;
@@ -20,6 +22,11 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
   onOpenChat,
 }) => {
   const [internalDocked, setInternalDocked] = useState(false);
+  const isStoredDocked = typeof window !== "undefined" && isPortfolioInitialized();
+  const isDocked = (propIsDocked !== undefined ? propIsDocked : internalDocked) || isStoredDocked;
+  const initialDockedRef = useRef(isDocked);
+
+
   const [dimensions, setDimensions] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 1200,
     height: typeof window !== "undefined" ? window.innerHeight : 800,
@@ -27,15 +34,13 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
 
   // Controle de transição e visibilidade inicial
   const [greetingVisible, setGreetingVisible] = useState(false);
-  const [hologramVisible, setHologramVisible] = useState(false);
+  const [hologramVisible, setHologramVisible] = useState(() => isDocked);
   const [isSystemActive, setIsSystemActive] = useState(false);
   const [typedMessage, setTypedMessage] = useState("");
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameId = useRef<number | null>(null);
-  const dockProgressRef = useRef<number>(0);
-
-  const isDocked = propIsDocked !== undefined ? propIsDocked : internalDocked;
+  const dockProgressRef = useRef<number>(isDocked ? 1 : 0);
 
   const welcomeVoiceText = "Sistema ativo. Bem-vindo ao portfólio de Jeferson Taveira.";
 
@@ -426,24 +431,26 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
       {/* ============================================================== */}
       {/* TELA DE FUNDO ESCURA (Fade out suave ao abrir o portfólio) */}
       {/* ============================================================== */}
-      <div
-        suppressHydrationWarning
-        className={`fixed inset-0 z-40 bg-black transition-opacity duration-1000 ${
-          isDocked ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
-        }`}
-      >
-        {/* Saudação Inicial: Bem-vindo */}
+      {!initialDockedRef.current && (
         <div
-          className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-400 pointer-events-none px-4 text-center ${
-            greetingVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          suppressHydrationWarning
+          className={`fixed inset-0 z-40 bg-black transition-opacity duration-1000 ${
+            isDocked ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
           }`}
         >
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] sm:tracking-[0.3em] text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]">
-            Bem-vindo
-          </h1>
-          <div className="w-14 sm:w-16 h-0.5 bg-gradient-to-r from-transparent via-[#00F2FE] to-transparent mt-4 sm:mt-5 opacity-70 animate-pulse" />
+          {/* Saudação Inicial: Bem-vindo */}
+          <div
+            className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-400 pointer-events-none px-4 text-center ${
+              greetingVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+            }`}
+          >
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] sm:tracking-[0.3em] text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]">
+              Bem-vindo
+            </h1>
+            <div className="w-14 sm:w-16 h-0.5 bg-gradient-to-r from-transparent via-[#00F2FE] to-transparent mt-4 sm:mt-5 opacity-70 animate-pulse" />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ============================================================== */}
       {/* HOLOGRAMA PERMANENTE JEFF: DESLOCAMENTO DINÂMICO PARA A ABA DE IA */}

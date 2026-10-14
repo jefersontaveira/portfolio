@@ -16,11 +16,15 @@ export const DEVELOPER_PROFILE = {
     "Engenheiro de Software com foco em soluções de ponta a ponta: do treinamento e otimização de modelos de Machine Learning em GPU à engenharia de microsserviços distribuídos em Python e interfaces web fluidas e responsivas.",
   location: "Brasil",
   contact: {
-    github: "https://github.com/jeferson-taveira",
-    linkedin: "https://linkedin.com/in/jeferson-taveira",
-    email: "jeferson.taveira@example.com", // personalizável
-    whatsapp: "https://wa.me/5500000000000",
+    github: "https://github.com/jefersontaveira",
+    linkedin: "https://www.linkedin.com/in/jefersontaveira",
+    instagram: "https://www.instagram.com/jeferson_taveria/",
+    email: "jefersontave@gmail.com",
+    whatsapp: "https://wa.me/5585981311975",
+    whatsappDisplay: "(85) 98131-1975",
   },
+
+
   highlights: [
     {
       metric: "94.2%",
