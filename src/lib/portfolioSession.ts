@@ -8,9 +8,12 @@ export function isPortfolioInitialized(): boolean {
   if (isInitializedMemory) return true;
   if (typeof window === "undefined") return false;
   try {
-    const isStored =
-      sessionStorage.getItem(PORTFOLIO_ACTIVE_KEY) === "true" ||
-      localStorage.getItem(PORTFOLIO_ACTIVE_KEY) === "true";
+    // Limpa resquícios antigos de localStorage para não travar a intro permanentemente
+    if (localStorage.getItem(PORTFOLIO_ACTIVE_KEY)) {
+      localStorage.removeItem(PORTFOLIO_ACTIVE_KEY);
+    }
+
+    const isStored = sessionStorage.getItem(PORTFOLIO_ACTIVE_KEY) === "true";
     if (isStored) {
       isInitializedMemory = true;
     }
@@ -26,11 +29,11 @@ export function setPortfolioInitialized(initialized: boolean = true): void {
   try {
     if (initialized) {
       sessionStorage.setItem(PORTFOLIO_ACTIVE_KEY, "true");
-      localStorage.setItem(PORTFOLIO_ACTIVE_KEY, "true");
     } else {
       sessionStorage.removeItem(PORTFOLIO_ACTIVE_KEY);
-      localStorage.removeItem(PORTFOLIO_ACTIVE_KEY);
     }
+    // Garante que o localStorage nunca mantenha a flag antiga
+    localStorage.removeItem(PORTFOLIO_ACTIVE_KEY);
   } catch {
     // Ignore storage errors (ex: modo anônimo restritivo)
   }
