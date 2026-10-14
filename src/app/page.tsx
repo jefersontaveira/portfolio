@@ -129,6 +129,7 @@ export default function Home() {
           setPortfolioOpen(true);
         }}
         onOpenChat={() => handleOpenChat()}
+        onCloseChat={handleCloseChat}
       />
 
       {/* Modal de Conversa com a IA do Jeff */}
@@ -136,6 +137,7 @@ export default function Home() {
         isOpen={isChatModalOpen}
         onClose={handleCloseChat}
         initialQuery={initialChatQuery}
+        onOpenExecutiveModal={() => setIsExecutiveModalOpen(true)}
       />
 
       {/* Modal do Modo Executivo (Fast-Track de 1 minuto) */}

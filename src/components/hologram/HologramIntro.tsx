@@ -12,6 +12,7 @@ interface HologramIntroProps {
   isChatOpen?: boolean;
   onEnterPortfolio: () => void;
   onOpenChat?: () => void;
+  onCloseChat?: () => void;
 }
 
 export const HologramIntro: React.FC<HologramIntroProps> = ({
@@ -20,6 +21,7 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
   isChatOpen = false,
   onEnterPortfolio,
   onOpenChat,
+  onCloseChat,
 }) => {
   const [internalDocked, setInternalDocked] = useState(false);
   const isStoredDocked = typeof window !== "undefined" && isPortfolioInitialized();
@@ -460,33 +462,37 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
         style={{
           position: "fixed",
           zIndex: isChatOpen ? 60 : 50,
-          right: isDocked ? (isChatOpen ? "50%" : dockedMargin) : "50%",
-          bottom: isDocked 
-            ? (isChatOpen 
-                ? (isMobile ? "calc(50% + 39vh - 20px)" : "calc(50% + 295px - 32px)") 
-                : dockedMargin) 
-            : "50%",
-          transform: isDocked 
-            ? (isChatOpen 
-                ? "translate(50%, 50%) scale(1)" 
-                : (isJeffVisible ? "translate(0, 0) scale(1)" : "translate(0, 0) scale(0.7)")) 
-            : "translate(50%, 50%)",
+          left: isChatOpen 
+            ? "50%" 
+            : (isDocked ? `calc(100% - ${containerSize}px - ${dockedMargin})` : "50%"),
+          top: isChatOpen 
+            ? (isMobile ? "calc(50% - 40vh)" : "calc(50% - 300px)") 
+            : (isDocked ? `calc(100% - ${containerSize}px - ${dockedMargin})` : "50%"),
+          transform: isChatOpen 
+            ? "translate(-50%, -50%) scale(1)" 
+            : (isDocked 
+                ? (isJeffVisible ? "translate(0, 0) scale(1)" : "translate(0, 0) scale(0.7)") 
+                : "translate(-50%, -50%)"),
           width: `${containerSize}px`,
           height: `${containerSize}px`,
           aspectRatio: "1 / 1",
           transition: "all 0.85s cubic-bezier(0.25, 1, 0.5, 1)",
           pointerEvents: isDocked 
-            ? (isChatOpen ? "none" : (isJeffVisible ? "auto" : "none")) 
+            ? (isJeffVisible ? "auto" : "none") 
             : (hologramVisible ? "auto" : "none"),
         }}
         onClick={() => {
-          if (isDocked && !isChatOpen && isJeffVisible && onOpenChat) {
-            onOpenChat();
+          if (isDocked && isJeffVisible) {
+            if (isChatOpen && onCloseChat) {
+              onCloseChat();
+            } else if (!isChatOpen && onOpenChat) {
+              onOpenChat();
+            }
           }
         }}
-        title={isDocked && !isChatOpen ? "Jeff • Clique para conversar com a IA" : undefined}
+        title={isDocked ? (isChatOpen ? "Jeff • Clique para fechar o chat" : "Jeff • Clique para conversar com a IA") : undefined}
         className={`flex items-center justify-center select-none shrink-0 ${
-          isDocked && !isChatOpen ? (isJeffVisible ? "cursor-pointer" : "pointer-events-none") : ""
+          isDocked && isJeffVisible ? "cursor-pointer" : "pointer-events-none"
         } ${
           isDocked
             ? (isChatOpen || isJeffVisible ? "opacity-100" : "opacity-0")
