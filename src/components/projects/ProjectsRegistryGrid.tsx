@@ -69,14 +69,14 @@ export const ProjectsRegistryGrid: React.FC = () => {
         </div>
 
         {/* Categorias / Filtros */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 mb-6 sm:overflow-x-auto sm:pb-3 no-scrollbar">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-mono transition-all ${
+              className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-mono transition-all text-center whitespace-normal sm:whitespace-nowrap ${
                 selectedCategory === cat.id
-                  ? "bg-gradient-to-r from-[#00F2FE]/15 to-[#38BDF8]/15 border border-[#00F2FE]/50 text-[#00F2FE] shadow-sm"
+                  ? "bg-gradient-to-r from-[#00F2FE]/15 to-[#38BDF8]/15 border border-[#00F2FE]/50 text-[#00F2FE] shadow-sm font-semibold"
                   : "bg-white/[0.03] border border-white/5 text-gray-400 hover:text-white hover:border-white/15"
               }`}
             >

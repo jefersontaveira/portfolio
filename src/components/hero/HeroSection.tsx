@@ -62,10 +62,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-8 flex flex-wrap items-center gap-3.5">
+            <div className="mt-8 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-3.5">
               <a
                 href="#projetos"
-                className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#00F2FE] to-[#38BDF8] text-black font-semibold text-xs sm:text-sm flex items-center gap-2 hover:opacity-95 shadow-lg shadow-[#00F2FE]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full sm:w-auto px-5 py-3.5 sm:py-3 rounded-xl bg-gradient-to-r from-[#00F2FE] to-[#38BDF8] text-black font-semibold text-sm sm:text-sm flex items-center justify-center gap-2 hover:opacity-95 shadow-lg shadow-[#00F2FE]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span>Explorar Projetos</span>
                 <ArrowRight className="w-4 h-4" />
@@ -73,7 +73,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
               <button
                 onClick={onOpenExecutiveModal}
-                className="px-5 py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 text-white font-medium text-xs sm:text-sm flex items-center gap-2 transition-all"
+                className="w-full sm:w-auto px-5 py-3.5 sm:py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 text-white font-medium text-sm sm:text-sm flex items-center justify-center gap-2 transition-all"
               >
                 <Sparkles className="w-4 h-4 text-[#00F2FE]" />
                 <span>Modo Executivo (1 min)</span>
@@ -81,7 +81,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
               <button
                 onClick={onOpenChat}
-                className="px-4 py-3 rounded-xl bg-[#A855F7]/10 hover:bg-[#A855F7]/20 border border-[#A855F7]/30 text-[#A855F7] font-medium text-xs sm:text-sm flex items-center gap-2 transition-all font-mono"
+                className="w-full sm:w-auto px-4 py-3.5 sm:py-3 rounded-xl bg-[#A855F7]/10 hover:bg-[#A855F7]/20 border border-[#A855F7]/30 text-[#A855F7] font-medium text-sm sm:text-sm flex items-center justify-center gap-2 transition-all font-mono"
               >
                 <Mic className="w-4 h-4" />
                 <span>Falar com Jeff (IA)</span>

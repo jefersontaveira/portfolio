@@ -91,10 +91,10 @@ export const AboutSection: React.FC = () => {
             </div>
 
             {/* Botões de Ação */}
-            <div className="pt-2 flex flex-wrap items-center gap-3.5">
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-3.5">
               <a
                 href="#contato"
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#00F2FE] to-[#38BDF8] text-black font-extrabold text-xs sm:text-sm font-mono flex items-center gap-2 hover:shadow-[0_0_20px_rgba(0,242,254,0.35)] transition-all cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3.5 sm:py-3 rounded-xl bg-gradient-to-r from-[#00F2FE] to-[#38BDF8] text-black font-extrabold text-sm sm:text-sm font-mono flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(0,242,254,0.35)] transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span>Falar Comigo</span>
                 <ArrowRight className="w-4 h-4" />
@@ -104,7 +104,7 @@ export const AboutSection: React.FC = () => {
                 href="/resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-200 hover:text-white text-xs sm:text-sm font-mono flex items-center gap-2 transition-all cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3.5 sm:py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-200 hover:text-white text-sm sm:text-sm font-mono flex items-center justify-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
                 <FileText className="w-4 h-4 text-[#00F2FE]" />
                 <span>Currículo (PDF)</span>

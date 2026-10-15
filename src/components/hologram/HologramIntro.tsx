@@ -402,27 +402,27 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
   const isTablet = dimensions.width >= 640 && dimensions.width < 1024;
 
   // Tamanho do holograma no centro (Intro):
-  // No PC: amplo e imponente (até 660px); no mobile: aumentado e imponente (até 440px / 94% da largura)
+  // No PC: amplo e imponente (até 660px); no mobile: aumentado para preencher melhor a tela
   const centralSize = isMobile
-    ? Math.min(Math.round(dimensions.width * 0.94), Math.round(dimensions.height * 0.58), 440)
+    ? Math.min(Math.round(dimensions.width * 0.96), Math.round(dimensions.height * 0.62), 480)
     : isTablet
     ? Math.min(Math.round(dimensions.width * 0.72), Math.round(dimensions.height * 0.62), 520)
     : Math.min(Math.round(dimensions.width * 0.55), Math.round(dimensions.height * 0.72), 660);
 
-  // Tamanho no canto inferior direito (Docked):
+  // Tamanho no canto inferior direito (Docked): aumentado no mobile para melhor visibilidade e toque
   const dockedSize = isMobile
-    ? (dimensions.width < 380 ? 94 : 108)
+    ? (dimensions.width < 380 ? 116 : 132)
     : isTablet
     ? 130
     : 160;
 
   // Margem simétrica diagonal
   const dockedMargin = isMobile
-    ? (dimensions.width < 380 ? "12px" : "16px")
+    ? (dimensions.width < 380 ? "10px" : "14px")
     : "24px";
 
   // Tamanho quando ancorado no topo do modal de IA:
-  const chatSize = isMobile ? 120 : 155;
+  const chatSize = isMobile ? 136 : 155;
 
   const containerSize = isDocked
     ? (isChatOpen ? chatSize : dockedSize)
