@@ -80,27 +80,27 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-start justify-between pb-4 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#00F2FE]/20 to-[#A855F7]/20 border border-[#00F2FE]/40 text-[#00F2FE]">
+        <div className="flex items-start justify-between pb-4 border-b border-white/10 gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#00F2FE]/20 to-[#A855F7]/20 border border-[#00F2FE]/40 text-[#00F2FE] shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
+            <div className="min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                 <h2 className="text-xl font-bold text-white tracking-tight">
                   {DEVELOPER_PROFILE.name}
                 </h2>
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-mono bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 flex items-center gap-1">
+                <span className="self-start sm:self-auto px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 inline-flex items-center gap-1 whitespace-nowrap">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
                   Disponível para Oportunidades
                 </span>
               </div>
-              <p className="text-sm text-gray-400 font-mono">{DEVELOPER_PROFILE.role}</p>
+              <p className="text-xs sm:text-sm text-gray-400 font-mono mt-0.5">{DEVELOPER_PROFILE.role}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+            className="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors shrink-0"
             aria-label="Fechar modal"
           >
             <X className="w-5 h-5" />
@@ -212,40 +212,43 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
         </div>
 
         {/* Quick Contact & Links */}
-        <div className="mt-8 pt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+        <div className="mt-8 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <a
               href={DEVELOPER_PROFILE.contact.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-white/5 border border-white/10 hover:border-[#00F2FE]/50 text-gray-300 hover:text-white transition-colors"
+              className="flex-1 sm:flex-none py-2.5 sm:py-2 px-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#00F2FE]/50 text-gray-300 hover:text-white transition-colors flex items-center justify-center gap-1.5 text-xs font-mono"
               title="GitHub"
             >
-              <Github className="w-4 h-4" />
+              <Github className="w-4 h-4 text-[#00F2FE]" />
+              <span className="sm:hidden font-medium">GitHub</span>
             </a>
             <a
               href={DEVELOPER_PROFILE.contact.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-white/5 border border-white/10 hover:border-[#38BDF8]/50 text-gray-300 hover:text-white transition-colors"
+              className="flex-1 sm:flex-none py-2.5 sm:py-2 px-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#38BDF8]/50 text-gray-300 hover:text-white transition-colors flex items-center justify-center gap-1.5 text-xs font-mono"
               title="LinkedIn"
             >
-              <Linkedin className="w-4 h-4" />
+              <Linkedin className="w-4 h-4 text-[#38BDF8]" />
+              <span className="sm:hidden font-medium">LinkedIn</span>
             </a>
             <a
               href={`mailto:${DEVELOPER_PROFILE.contact.email}`}
-              className="p-2 rounded-lg bg-white/5 border border-white/10 hover:border-[#A855F7]/50 text-gray-300 hover:text-white transition-colors"
+              className="flex-1 sm:flex-none py-2.5 sm:py-2 px-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#A855F7]/50 text-gray-300 hover:text-white transition-colors flex items-center justify-center gap-1.5 text-xs font-mono"
               title="Email direto"
             >
-              <Mail className="w-4 h-4" />
+              <Mail className="w-4 h-4 text-[#A855F7]" />
+              <span className="sm:hidden font-medium">Email</span>
             </a>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="w-full sm:w-auto">
             <a
               href="/resume.pdf"
               download
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#00F2FE] to-[#38BDF8] text-black font-semibold text-xs flex items-center gap-1.5 hover:opacity-95 shadow-lg shadow-[#00F2FE]/20 transition-all"
+              className="w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-xl bg-gradient-to-r from-[#00F2FE] to-[#38BDF8] text-black font-semibold text-xs flex items-center justify-center gap-2 hover:opacity-95 shadow-lg shadow-[#00F2FE]/20 transition-all text-center"
             >
               <Download className="w-4 h-4" />
               <span>Baixar Currículo PDF</span>

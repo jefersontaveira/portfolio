@@ -188,11 +188,11 @@ export const ContactSection: React.FC = () => {
             </p>
           </div>
 
-          {/* Botões Utilitários do Header */}
-          <div className="flex flex-wrap items-center gap-3">
+          {/* Botões Utilitários do Header (Alinhados com largura total e centralizados no mobile) */}
+          <div className="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
             <button
               onClick={handleVoiceIntroduction}
-              className="px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 text-xs font-mono text-gray-300 flex items-center gap-2 transition-all cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 text-xs font-mono text-gray-300 flex items-center justify-center gap-2 transition-all cursor-pointer text-center"
               title="Ouvir mensagem por voz"
             >
               <Volume2 className="w-4 h-4 text-[#00F2FE]" />
@@ -201,7 +201,7 @@ export const ContactSection: React.FC = () => {
 
             <button
               onClick={handleCopyAll}
-              className="px-4 py-2 rounded-xl bg-[#00F2FE]/15 hover:bg-[#00F2FE]/25 border border-[#00F2FE]/40 text-xs font-mono text-[#00F2FE] flex items-center gap-2 transition-all cursor-pointer font-bold shadow-[0_0_20px_rgba(0,242,254,0.15)]"
+              className="w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-xl bg-[#00F2FE]/15 hover:bg-[#00F2FE]/25 border border-[#00F2FE]/40 text-xs font-mono text-[#00F2FE] flex items-center justify-center gap-2 transition-all cursor-pointer font-bold shadow-[0_0_20px_rgba(0,242,254,0.15)] text-center"
             >
               {copiedAll ? (
                 <>

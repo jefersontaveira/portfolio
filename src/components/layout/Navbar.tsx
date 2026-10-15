@@ -43,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, [mobileMenuOpen]);
 
   return (
-    <header suppressHydrationWarning className="sticky top-0 z-30 w-full backdrop-blur-xl bg-[#080B11]/75 border-b border-white/[0.08] transition-all">
+    <header suppressHydrationWarning className={`sticky top-0 ${mobileMenuOpen ? 'z-[100]' : 'z-30'} w-full backdrop-blur-xl bg-[#080B11]/75 border-b border-white/[0.08] transition-all`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 sm:h-[84px] flex items-center justify-between">
         {/* Brand / Logo */}
         <a href="#hero" className="flex items-center gap-2 group">
@@ -140,9 +140,12 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
       </div>
 
-      {/* Menu Mobile em Tela Cheia (Cobre 100% da tela no telefone) */}
+      {/* Menu Mobile em Tela Cheia (Cobre 100% da tela no telefone com fundo 100% opaco) */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-[#080B11]/98 backdrop-blur-2xl flex flex-col justify-between p-6 h-screen w-screen overflow-y-auto animate-fadeIn">
+        <div
+          style={{ backgroundColor: "#080B11" }}
+          className="md:hidden fixed inset-0 z-[100] bg-[#080B11] flex flex-col justify-between p-6 h-screen w-screen overflow-y-auto animate-fadeIn"
+        >
           {/* Top Bar do Modal Mobile */}
           <div className="flex items-center justify-between pb-5 border-b border-white/10 shrink-0">
             <div className="flex items-center gap-2">
