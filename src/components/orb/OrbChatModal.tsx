@@ -116,7 +116,7 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
       setIsVisible(false);
       animTimer = setTimeout(() => {
         setIsRendered(false);
-      }, 350);
+      }, 300);
     }
     return () => clearTimeout(animTimer);
   }, [isOpen]);
@@ -407,19 +407,20 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overscroll-contain transition-opacity duration-500 ease-out ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overscroll-contain transition-opacity duration-300 ease-out ${
         isVisible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       onClick={onClose}
     >
       <div 
-        className={`relative w-full max-w-xl bg-[#0F172A] border border-[#00F2FE]/25 rounded-2xl shadow-[0_0_60px_rgba(0,242,254,0.2)] flex flex-col h-[80vh] sm:h-[600px] overflow-hidden transition-all duration-500 ease-out transform ${
-          isVisible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-4"
+        className={`relative w-full max-w-xl bg-[#0F172A] border border-[#00F2FE]/25 rounded-2xl shadow-[0_0_60px_rgba(0,242,254,0.2)] flex flex-col h-[80vh] sm:h-[600px] overflow-hidden transition-all duration-300 ease-out transform origin-top ${
+          isVisible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-0"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Glow Superior de Ancoragem Holográfica */}
-        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#00F2FE] to-transparent opacity-80" />
+        {/* Glow Superior de Ancoragem Holográfica (Projeção a partir do Holograma) */}
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#00F2FE] to-transparent opacity-90" />
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-48 h-8 bg-[#00F2FE]/30 blur-xl pointer-events-none rounded-full" />
 
         {/* Header */}
         <div className="p-3.5 sm:p-4 border-b border-white/10 flex items-center justify-between bg-[#080B11]/70">

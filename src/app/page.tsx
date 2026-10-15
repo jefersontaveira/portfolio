@@ -61,9 +61,12 @@ export default function Home() {
 
   const handleCloseChat = () => {
     if (chatFlightTimerRef.current) clearTimeout(chatFlightTimerRef.current);
-    // Fecha o modal suavemente e retorna o holograma para a base do canto
+    // 1. O pop-up fecha suavemente retraindo de volta para o holograma
     setIsChatModalOpen(false);
-    setIsHologramAtChat(false);
+    // 2. Quando o pop-up terminar de fechar (300ms), o holograma retorna suavemente para o canto
+    chatFlightTimerRef.current = setTimeout(() => {
+      setIsHologramAtChat(false);
+    }, 300);
   };
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Sparkles, Download, Github, Linkedin, Mail, ExternalLink, CheckCircle2, Volume2 } from "lucide-react";
 import { DEVELOPER_PROFILE } from "@/lib/careerContext";
 import { SpeechManager } from "@/lib/speechHelper";
@@ -16,6 +16,33 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
   onClose,
   voiceActive,
 }) => {
+  const [isRendered, setIsRendered] = useState(isOpen);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Animação sincronizada de entrada e saída suave (Fade-In & Fade-Out com Zoom)
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isOpen) {
+      setIsRendered(true);
+      timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 20);
+    } else {
+      setIsVisible(false);
+      timer = setTimeout(() => {
+        setIsRendered(false);
+      }, 300);
+    }
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
+  const handleSmoothClose = () => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
   // Bloqueia a rolagem da página de fundo enquanto o modal estiver aberto
   useEffect(() => {
     if (isOpen) {
@@ -35,10 +62,10 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
         }
       };
 
-      // Fechar modal ao pressionar tecla ESC ou evitar rolagem da página por teclas
+      // Fechar modal suavemente ao pressionar tecla ESC ou evitar rolagem da página por teclas
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Escape") {
-          onClose();
+          handleSmoothClose();
           return;
         }
         if (["Space", "PageUp", "PageDown"].includes(e.code)) {
@@ -60,9 +87,9 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
         window.removeEventListener("keydown", handleKeyDown);
       };
     }
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!isRendered) return null;
 
   const handleReadSummary = () => {
     SpeechManager.speak(
@@ -72,11 +99,15 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overscroll-contain"
-      onClick={onClose}
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overscroll-contain transition-opacity duration-300 ease-out ${
+        isVisible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}
+      onClick={handleSmoothClose}
     >
       <div 
-        className="relative w-full max-w-2xl bg-[#0F172A] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl overflow-y-auto overscroll-contain max-h-[90vh]"
+        className={`relative w-full max-w-2xl bg-[#0F172A] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl overflow-y-auto overscroll-contain max-h-[90vh] transition-all duration-300 ease-out transform ${
+          isVisible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-2"
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -99,7 +130,7 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleSmoothClose}
             className="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors shrink-0"
             aria-label="Fechar modal"
           >

@@ -31,11 +31,18 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   // Trava a rolagem da página de fundo quando o menu mobile estiver aberto
+  const [isHeaderElevated, setIsHeaderElevated] = useState(false);
+
   React.useEffect(() => {
     if (mobileMenuOpen) {
+      setIsHeaderElevated(true);
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
+      const timer = setTimeout(() => {
+        setIsHeaderElevated(false);
+      }, 350);
+      return () => clearTimeout(timer);
     }
     return () => {
       document.body.style.overflow = "";
@@ -43,7 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, [mobileMenuOpen]);
 
   return (
-    <header suppressHydrationWarning className={`sticky top-0 ${mobileMenuOpen ? 'z-[100]' : 'z-30'} w-full backdrop-blur-xl bg-[#080B11]/75 border-b border-white/[0.08] transition-all`}>
+    <header suppressHydrationWarning className={`sticky top-0 ${isHeaderElevated ? 'z-[100]' : 'z-30'} w-full backdrop-blur-xl bg-[#080B11]/75 border-b border-white/[0.08] transition-all`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 sm:h-[84px] flex items-center justify-between">
         {/* Brand / Logo */}
         <a href="#hero" className="flex items-center gap-2 group">
@@ -140,12 +147,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
       </div>
 
-      {/* Menu Mobile em Tela Cheia (Cobre 100% da tela no telefone com fundo 100% opaco) */}
-      {mobileMenuOpen && (
-        <div
-          style={{ backgroundColor: "#080B11" }}
-          className="md:hidden fixed inset-0 z-[100] bg-[#080B11] flex flex-col justify-between p-6 h-screen w-screen overflow-y-auto animate-fadeIn"
-        >
+      {/* Menu Mobile Lateral (Desliza da lateral ao abrir e retorna à lateral ao fechar) */}
+      <div
+        style={{ backgroundColor: "#080B11" }}
+        className={`md:hidden fixed inset-0 z-[100] bg-[#080B11] flex flex-col justify-between p-6 h-screen w-screen overflow-y-auto transition-transform duration-300 ease-in-out ${
+          mobileMenuOpen ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
+        }`}
+        aria-hidden={!mobileMenuOpen}
+      >
           {/* Top Bar do Modal Mobile */}
           <div className="flex items-center justify-between pb-5 border-b border-white/10 shrink-0">
             <div className="flex items-center gap-2">
@@ -249,7 +258,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </a>
           </div>
         </div>
-      )}
     </header>
   );
 };
