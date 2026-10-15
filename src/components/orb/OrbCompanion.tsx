@@ -1,28 +1,24 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { Mic, MicOff, MessageSquare, Volume2, Sparkles, X, ChevronUp } from "lucide-react";
-import { SpeechManager } from "@/lib/speechHelper";
+import React, { useState, useEffect } from "react";
+import { MessageSquare, Sparkles, X, ChevronUp } from "lucide-react";
 
-export type OrbState = "IDLE" | "SPEAKING" | "LISTENING" | "THINKING";
+export type OrbState = "IDLE" | "THINKING";
 
 interface OrbCompanionProps {
   onOpenChat: () => void;
-  voiceActive: boolean;
+  voiceActive?: boolean;
   onVoiceInput?: (text: string) => void;
 }
 
 export const OrbCompanion: React.FC<OrbCompanionProps> = ({
   onOpenChat,
-  voiceActive,
-  onVoiceInput,
 }) => {
   const [orbState, setOrbState] = useState<OrbState>("IDLE");
   const [bubbleText, setBubbleText] = useState<string>(
-    "Olá! Sou o ORB, seu guia no portfólio de engenharia do Jeferson. Posso responder dúvidas por texto ou voz!"
+    "Olá! Sou o Jeff, seu guia interativo pelo portfólio. Clique para tirar dúvidas e navegar pelos projetos!"
   );
   const [isBubbleVisible, setIsBubbleVisible] = useState(true);
-  const [isListening, setIsListening] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState(false);
 
   // Fecha o balão após alguns segundos caso o usuário prefira foco
@@ -34,61 +30,9 @@ export const OrbCompanion: React.FC<OrbCompanionProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSpeakBubble = () => {
-    if (!bubbleText) return;
-    setOrbState("SPEAKING");
-    SpeechManager.speak(
-      bubbleText,
-      () => setOrbState("SPEAKING"),
-      () => setOrbState("IDLE")
-    );
-  };
-
-  const toggleMicListening = () => {
-    if (isListening) {
-      SpeechManager.stopListening();
-      setIsListening(false);
-      setOrbState("IDLE");
-    } else {
-      setIsListening(true);
-      setOrbState("LISTENING");
-      setBubbleText("Ouvindo sua pergunta... Fale agora!");
-      setIsBubbleVisible(true);
-
-      const supported = SpeechManager.startListening(
-        (transcript) => {
-          setBubbleText(`Você disse: "${transcript}"`);
-          if (onVoiceInput) {
-            onVoiceInput(transcript);
-          }
-        },
-        (error) => {
-          console.warn("Speech error:", error);
-          setIsListening(false);
-          setOrbState("IDLE");
-          setBubbleText("Não consegui ouvir com clareza. Tente novamente ou use o chat por texto.");
-        },
-        () => {
-          setIsListening(false);
-          setOrbState("IDLE");
-        }
-      );
-
-      if (!supported) {
-        setIsListening(false);
-        setOrbState("IDLE");
-        setBubbleText("Seu navegador não suporta reconhecimento de voz. Você pode conversar via texto!");
-      }
-    }
-  };
-
   // Cores dinâmicas de acordo com o estado do ORB
   const getOrbColor = () => {
     switch (orbState) {
-      case "SPEAKING":
-        return "from-[#00F2FE] via-[#38BDF8] to-[#10B981]";
-      case "LISTENING":
-        return "from-[#10B981] via-[#34D399] to-[#00F2FE]";
       case "THINKING":
         return "from-[#A855F7] via-[#C084FC] to-[#00F2FE]";
       default:
@@ -114,24 +58,14 @@ export const OrbCompanion: React.FC<OrbCompanionProps> = ({
             </button>
             <div className="flex items-center gap-1.5 text-[#00F2FE] font-mono font-semibold mb-1">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>ORB Copilot</span>
-              {orbState === "LISTENING" && (
-                <span className="text-[10px] text-[#10B981] animate-pulse">● Ouvindo</span>
-              )}
+              <span>Jeff Copilot</span>
             </div>
             <p className="leading-relaxed pr-3">{bubbleText}</p>
 
-            <div className="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between">
-              <button
-                onClick={handleSpeakBubble}
-                className="text-[11px] text-[#00F2FE] hover:underline flex items-center gap-1 font-mono"
-              >
-                <Volume2 className="w-3 h-3" />
-                <span>Ouvir</span>
-              </button>
+            <div className="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-end">
               <button
                 onClick={onOpenChat}
-                className="text-[11px] text-[#A855F7] hover:underline flex items-center gap-1 font-mono"
+                className="text-[11px] text-[#00F2FE] hover:underline flex items-center gap-1 font-mono"
               >
                 <MessageSquare className="w-3 h-3" />
                 <span>Abrir Chat</span>
@@ -142,19 +76,6 @@ export const OrbCompanion: React.FC<OrbCompanionProps> = ({
 
         {/* O ORB Esférico com Efeito de Pulso Ultraleve (Puro CSS e SVG) */}
         <div className="flex items-center gap-2">
-          {/* Microfone Rápido */}
-          <button
-            onClick={toggleMicListening}
-            className={`p-2.5 rounded-full border shadow-lg transition-all ${
-              isListening
-                ? "bg-[#10B981] border-[#10B981] text-black animate-pulse"
-                : "bg-[#0F172A]/90 border-white/10 text-gray-300 hover:text-white hover:border-[#00F2FE]/50"
-            }`}
-            title={isListening ? "Desativar microfone" : "Falar com o ORB por voz"}
-          >
-            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-          </button>
-
           {/* O ORB propriamente dito */}
           <div
             onClick={onOpenChat}
@@ -170,7 +91,7 @@ export const OrbCompanion: React.FC<OrbCompanionProps> = ({
             <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-[#080B11] via-[#0F172A] to-[#1E293B] border border-white/30 flex items-center justify-center overflow-hidden shadow-inner">
               <div
                 className={`w-6 h-6 rounded-full bg-gradient-to-tr ${getOrbColor()} opacity-80 animate-ping`}
-                style={{ animationDuration: orbState === "SPEAKING" ? "1s" : "3s" }}
+                style={{ animationDuration: "3s" }}
               />
               <Sparkles className="absolute w-5 h-5 text-white/90 drop-shadow" />
             </div>
@@ -183,17 +104,6 @@ export const OrbCompanion: React.FC<OrbCompanionProps> = ({
       {/* ============================================================== */}
       <div className="fixed bottom-4 right-4 z-40 sm:hidden select-none">
         <div className="flex items-center gap-2 bg-[#0F172A]/90 backdrop-blur-md border border-[#00F2FE]/30 rounded-full px-3 py-2 shadow-xl">
-          {/* Microfone */}
-          <button
-            onClick={toggleMicListening}
-            className={`p-2 rounded-full transition-colors ${
-              isListening ? "bg-[#10B981] text-black" : "text-gray-300 hover:text-white"
-            }`}
-            aria-label="Microfone"
-          >
-            {isListening ? <MicOff className="w-4 h-4 animate-pulse" /> : <Mic className="w-4 h-4" />}
-          </button>
-
           {/* Mini ORB que abre o Chat */}
           <button
             onClick={onOpenChat}
@@ -206,7 +116,7 @@ export const OrbCompanion: React.FC<OrbCompanionProps> = ({
               </div>
             </div>
             <span className="text-xs font-mono font-medium text-gray-200">
-              ORB IA
+              Jeff IA
             </span>
           </button>
         </div>

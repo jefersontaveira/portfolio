@@ -6,6 +6,10 @@
 
 ---
 
+> 📖 **Guia Prático 100% Gratuito:** Veja o passo a passo completo no Fish Audio / F5-TTS e o roteiro de gravação em: [`planejamento/passo_a_passo_clonagem_gratuita.md`](./passo_a_passo_clonagem_gratuita.md).
+
+---
+
 ## 1. Visão Geral da Arquitetura de Áudio
 
 O sistema de voz será dividido em **duas camadas estratégicas**:

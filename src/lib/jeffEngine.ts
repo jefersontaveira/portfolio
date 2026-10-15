@@ -194,7 +194,7 @@ Clique nos botões rápidos abaixo para falar diretamente ou rolar até o formul
       ],
       suggestions: [
         "Me explique o SaaS de Arenas",
-        "Como funciona o Cluster DevOps?",
+        "Como foi feito o site do Thalles Rayanderson?",
         "Quais são os contatos do Jeferson?",
       ],
     };
@@ -247,7 +247,7 @@ Clique nos botões rápidos abaixo para falar diretamente ou rolar até o formul
       ],
       suggestions: [
         "Como funciona o classificador de desenhos?",
-        "Como foi criado o Cluster Docker?",
+        "Como foi feito o app Só Se For Açaí?",
         "Como contratar o Jeferson?",
       ],
     };
@@ -553,7 +553,7 @@ Escolha um dos botões abaixo para explorar em detalhes:`,
   return {
     reply: `Sou o **Jeff**, copiloto de IA do portfólio de **${JEFF_CONTACTS.name}**. 
     
-Posso te explicar a fundo a arquitetura técnica de qualquer projeto (como o **SaaS de Arenas em Django**, o **Classificador Neural QuickDraw CNN** ou o **Cluster DevOps**), fornecer os contatos diretos do Jeferson ou te guiar para qualquer seção do site!`,
+Posso te explicar a fundo a arquitetura técnica de qualquer projeto (como o **SaaS de Arenas em Django**, o **Classificador Neural QuickDraw CNN** ou os **Sites em Produção**), fornecer os contatos diretos do Jeferson ou te guiar para qualquer seção do site!`,
     actions: [
       {
         id: "act-scroll-projects",

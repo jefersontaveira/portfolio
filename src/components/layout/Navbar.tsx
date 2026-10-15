@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Terminal, Volume2, VolumeX, Sparkles, FileText, Menu, X, Code2, Radio } from "lucide-react";
-import { SpeechManager } from "@/lib/speechHelper";
+import { Terminal, Sparkles, FileText, Menu, X, Code2, Radio } from "lucide-react";
 
 interface NavbarProps {
   onOpenExecutiveModal: () => void;
-  voiceActive: boolean;
-  onToggleVoice: () => void;
+  voiceActive?: boolean;
+  onToggleVoice?: () => void;
   isJeffVisible?: boolean;
   onToggleJeff?: () => void;
 }
@@ -40,14 +39,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     return <Icon className={className} />;
   };
 
-  const handleVoiceToggle = () => {
-    onToggleVoice();
-    if (!voiceActive) {
-      SpeechManager.speak("Sistema de voz ativado. Como posso ajudar na sua visita?");
-    } else {
-      SpeechManager.stopSpeaking();
-    }
-  };
+
 
   // Trava a rolagem da página de fundo quando o menu mobile estiver aberto
   const [isHeaderElevated, setIsHeaderElevated] = useState(false);
@@ -118,21 +110,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* Voice Toggle Button */}
-          <button
-            onClick={handleVoiceToggle}
-            title={voiceActive ? "Silenciar narração de Jeff" : "Ativar narração por voz de Jeff"}
-            className={`p-2 rounded-lg border text-xs flex items-center gap-1.5 transition-all ${
-              voiceActive
-                ? "bg-[#10B981]/15 border-[#10B981]/50 text-[#10B981]"
-                : "bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20"
-            }`}
-          >
-            <SafeIcon icon={voiceActive ? Volume2 : VolumeX} className={`w-4 h-4 ${voiceActive ? "animate-pulse" : ""}`} />
-            <span className="font-mono text-[11px] hidden lg:inline">
-              {voiceActive ? "Voz ON" : "Voz OFF"}
-            </span>
-          </button>
+
 
           {/* Executive Summary Button (Fast Track para recrutadores) */}
           <button
@@ -254,17 +232,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            <button
-              onClick={handleVoiceToggle}
-              className={`w-full py-3.5 px-4 rounded-xl border text-sm font-medium flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
-                voiceActive
-                  ? "bg-[#10B981]/15 border-[#10B981]/50 text-[#10B981]"
-                  : "bg-white/5 border-white/10 text-gray-400"
-              }`}
-            >
-              <SafeIcon icon={voiceActive ? Volume2 : VolumeX} className="w-4 h-4" />
-              <span>{voiceActive ? "Voz Jeff Ativada (ON)" : "Voz Jeff Desativada (OFF)"}</span>
-            </button>
+
 
             <a
               href="/resume.pdf"

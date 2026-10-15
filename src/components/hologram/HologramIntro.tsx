@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Play } from "lucide-react";
-import { SpeechManager } from "@/lib/speechHelper";
 import { isPortfolioInitialized } from "@/lib/portfolioSession";
 
 
@@ -91,41 +90,9 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
     };
   }, [isDocked]);
 
-  // Efeito sonoro futurista de ativação
-  const playSciFiSound = () => {
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(160, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(920, ctx.currentTime + 0.6);
-
-      gain.gain.setValueAtTime(0.01, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.3);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start();
-      osc.stop(ctx.currentTime + 0.7);
-    } catch (e) {
-      // Ignora caso bloqueado pelo navegador
-    }
-  };
-
   // Clique no botão "Iniciar Sistema"
   const handleStartSystem = () => {
     setIsSystemActive(true);
-    playSciFiSound();
-
-    let typingFinished = false;
-    let voiceFinished = false;
 
     const transitionToPortfolio = () => {
       setTimeout(() => {
@@ -135,17 +102,6 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
     };
 
     setTimeout(() => {
-      SpeechManager.speak(
-        welcomeVoiceText,
-        () => { },
-        () => {
-          voiceFinished = true;
-          if (typingFinished) {
-            transitionToPortfolio();
-          }
-        }
-      );
-
       let i = 0;
       const interval = setInterval(() => {
         if (i <= welcomeVoiceText.length) {
@@ -153,7 +109,6 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
           i++;
         } else {
           clearInterval(interval);
-          typingFinished = true;
           setTimeout(() => {
             transitionToPortfolio();
           }, 600);

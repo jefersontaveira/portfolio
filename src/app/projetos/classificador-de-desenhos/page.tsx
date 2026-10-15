@@ -8,7 +8,6 @@ import {
   Cpu, 
   Code2, 
   RotateCcw, 
-  Volume2, 
   Sparkles, 
   Layers, 
   Activity, 
@@ -18,7 +17,6 @@ import {
   Zap,
   ExternalLink
 } from "lucide-react";
-import { SpeechManager } from "@/lib/speechHelper";
 import { getOnnxSession, runQuickDrawInference } from "@/lib/onnxInference";
 
 const CLASSES = [
@@ -294,15 +292,7 @@ export default function ClassificadorDesenhosPage() {
     }
   };
 
-  const handleVoiceNarration = () => {
-    if (predictions.length > 0) {
-      SpeechManager.speak(
-        `O classificador identificou o traço como ${predictions[0].name} com ${predictions[0].score}% de confiança.`
-      );
-    } else {
-      SpeechManager.speak("Faça um traço no canvas para que a rede neural calcule as probabilidades.");
-    }
-  };
+
 
   return (
     <div className="min-h-screen bg-[#080B11] text-[#F8FAFC] selection:bg-[#00F2FE]/20 selection:text-[#00F2FE] relative overflow-x-hidden">
@@ -519,14 +509,7 @@ export default function ClassificadorDesenhosPage() {
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Limpar Tela</span>
                 </button>
-                <button
-                  onClick={handleVoiceNarration}
-                  className="p-2.5 px-3.5 rounded-xl bg-[#00F2FE]/15 hover:bg-[#00F2FE]/25 border border-[#00F2FE]/40 text-[#00F2FE] text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
-                  title="Ouvir predição por voz"
-                >
-                  <Volume2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Ouvir Voz</span>
-                </button>
+
                 {/* Tensor Preview Compacto integrado */}
                 <div
                   className="flex items-center gap-1.5 p-1.5 px-2.5 rounded-xl bg-[#080B11] border border-[#00F2FE]/30 shrink-0"

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { Sparkles, ArrowRight, Code2, Cpu, Database, Server, Mic, Briefcase, CheckCircle2 } from "lucide-react";
+import { Sparkles, ArrowRight, Code2, Cpu, Database, Server, MessageSquare, Briefcase, CheckCircle2 } from "lucide-react";
 import { DEVELOPER_PROFILE } from "@/lib/careerContext";
 
 interface HeroSectionProps {
@@ -83,43 +83,43 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 onClick={onOpenChat}
                 className="w-full sm:w-auto px-4 py-3.5 sm:py-3 rounded-xl bg-[#A855F7]/10 hover:bg-[#A855F7]/20 border border-[#A855F7]/30 text-[#A855F7] font-medium text-sm sm:text-sm flex items-center justify-center gap-2 transition-all font-mono"
               >
-                <Mic className="w-4 h-4" />
-                <span>Falar com Jeff (IA)</span>
+                <MessageSquare className="w-4 h-4" />
+                <span>Conversar com Jeff (IA)</span>
               </button>
             </div>
           </div>
 
-          {/* Coluna da Direita: Imagem Recortada Preenchendo o Background */}
-          <div className="lg:col-span-5 relative flex justify-center lg:justify-end mt-4 lg:mt-0">
-            <div className="relative w-full max-w-[420px] sm:max-w-[480px] lg:max-w-[540px]">
+          {/* Coluna da Direita: Imagem Recortada Alinhada com os Textos */}
+          <div className="lg:col-span-5 relative flex justify-center lg:justify-end mt-6 lg:mt-0 items-end">
+            <div className="relative w-full max-w-[320px] sm:max-w-[370px] lg:max-w-[400px] xl:max-w-[420px]">
               {/* Glow atmosférico concentrado atrás da silhueta */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[440px] bg-gradient-to-tr from-[#00F2FE]/25 via-[#A855F7]/25 to-transparent blur-3xl rounded-full pointer-events-none -z-10" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[360px] bg-gradient-to-tr from-[#00F2FE]/20 via-[#A855F7]/20 to-transparent blur-3xl rounded-full pointer-events-none -z-10" />
 
               {/* Imagem Recortada sem Fundo / Moldura, Integrada Diretamente ao Tema Escuro */}
-              <div className="relative aspect-[3/4] w-full overflow-hidden select-none">
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl select-none">
                 <Image
                   src="/images/profile.jpg"
                   alt="Jeferson Taveira - Engenheiro de Software Full Stack & IA"
-                  width={560}
-                  height={740}
+                  width={500}
+                  height={625}
                   priority
-                  className="w-full h-full object-cover object-top scale-105 hover:scale-108 transition-transform duration-700"
+                  className="w-full h-full object-cover object-top scale-102 hover:scale-105 transition-transform duration-700"
                 />
 
                 {/* Gradiente de Fusão na Base (Transição Suave para o Preto da Página) */}
-                <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#080B11] via-[#080B11]/80 to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#080B11] via-[#080B11]/70 to-transparent pointer-events-none" />
 
                 {/* Gradiente de Fusão na Esquerda (Fusão Suave com o Conteúdo de Texto) */}
-                <div className="absolute inset-y-0 left-0 w-28 bg-gradient-to-r from-[#080B11] via-[#080B11]/50 to-transparent pointer-events-none hidden lg:block" />
+                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#080B11] via-[#080B11]/40 to-transparent pointer-events-none hidden lg:block" />
 
                 {/* Gradiente de Fusão no Topo */}
-                <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#080B11] to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-[#080B11] to-transparent pointer-events-none" />
               </div>
 
               {/* Badge Flutuante de Status Integrado */}
-              <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-20 flex items-center justify-between gap-3 p-2.5 rounded-xl bg-[#080B11]/90 backdrop-blur-md border border-[#10B981]/30 shadow-2xl">
+              <div className="absolute bottom-3 left-3 right-3 sm:left-auto sm:right-3 z-20 flex items-center justify-between gap-3 px-3 py-2 sm:py-2.5 rounded-xl bg-[#080B11]/95 backdrop-blur-md border border-[#10B981]/40 shadow-2xl shadow-black/80">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
                   <span className="text-[11px] font-mono text-white font-medium">Disponível para Projetos & Vagas</span>
                 </div>
                 <span className="text-[10px] font-mono text-[#00F2FE] bg-[#00F2FE]/10 px-2 py-0.5 rounded border border-[#00F2FE]/20">

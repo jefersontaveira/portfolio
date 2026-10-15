@@ -6,9 +6,6 @@ import {
   X, 
   Send, 
   Sparkles, 
-  Mic, 
-  MicOff, 
-  Volume2, 
   Bot, 
   User, 
   ExternalLink,
@@ -24,7 +21,6 @@ import {
   Compass,
   Play
 } from "lucide-react";
-import { SpeechManager } from "@/lib/speechHelper";
 import { ChatAction, JEFF_CONTACTS } from "@/lib/jeffKnowledge";
 
 export interface ChatMessage {
@@ -47,7 +43,7 @@ const DEFAULT_SUGGESTIONS = [
   "📱 Quais são os contatos do Jeferson?",
   "🏟️ Me explique o SaaS de Arenas",
   "🧠 Como funciona o Classificador de IA (ONNX)?",
-  "🧪 Como testar o Sandbox ao vivo?",
+  "🏛️ Como foi feito o site do Thalles Rayanderson?",
   "📍 Me leve para a seção Sobre",
 ];
 
@@ -94,7 +90,6 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
 
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   const [copiedActionId, setCopiedActionId] = useState<string | null>(null);
   const [dynamicSuggestions, setDynamicSuggestions] = useState<string[]>(DEFAULT_SUGGESTIONS);
 
@@ -168,28 +163,7 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
 
   if (!isRendered) return null;
 
-  const handleSpeech = (text: string) => {
-    // Remove marcações markdown antes de falar
-    const cleanText = text.replace(/[*#_`\[\]()]/g, "");
-    SpeechManager.speak(cleanText);
-  };
 
-  const toggleMic = () => {
-    if (isListening) {
-      SpeechManager.stopListening();
-      setIsListening(false);
-    } else {
-      setIsListening(true);
-      const ok = SpeechManager.startListening(
-        (transcript) => {
-          setInputValue(transcript);
-        },
-        () => setIsListening(false),
-        () => setIsListening(false)
-      );
-      if (!ok) setIsListening(false);
-    }
-  };
 
   // Trata cliques nos botões de ação e direcionamento
   const handleActionClick = (action: ChatAction) => {
@@ -269,9 +243,6 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
               : m
           )
         );
-        if (suggestions && suggestions.length > 0) {
-          setDynamicSuggestions(suggestions);
-        }
       } else {
         const currentSlice = fullText.slice(0, currentIdx);
         setMessages((prev) =>
@@ -297,6 +268,7 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
 
     setMessages((prev) => [...prev, userMsg]);
     setInputValue("");
+    setDynamicSuggestions([]);
     setIsLoading(true);
 
     try {
@@ -504,16 +476,6 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
 
                 <div className="mt-2 flex items-center justify-between text-[10px] text-gray-400 font-mono">
                   <span>{msg.timestamp}</span>
-                  {msg.sender === "orb" && !msg.isTyping && (
-                    <button
-                      onClick={() => handleSpeech(msg.text)}
-                      className="text-[#00F2FE] hover:underline flex items-center gap-1 ml-2 cursor-pointer"
-                      title="Ouvir esta resposta"
-                    >
-                      <Volume2 className="w-3 h-3" />
-                      <span>Ouvir</span>
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
@@ -537,45 +499,34 @@ export const OrbChatModal: React.FC<OrbChatModalProps> = ({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Sugestões Dinâmicas de Perguntas Rápidas */}
-        <div className="px-3.5 py-2 border-t border-white/5 bg-[#080B11]/60 flex flex-wrap items-center gap-1.5 max-h-[96px] overflow-y-auto">
-          <span className="text-[10px] font-mono text-gray-400 uppercase mr-1 flex items-center gap-1 select-none shrink-0">
-            <Compass className="w-3 h-3 text-[#00F2FE]" />
-            Sugestões:
-          </span>
-          {dynamicSuggestions.map((chip, idx) => (
-            <button
-              key={idx}
-              onClick={() => sendMessage(chip.replace(/^[^\w\s]+/, "").trim())}
-              className="px-2.5 py-1 rounded-full text-[11px] bg-slate-900/90 hover:bg-slate-800 border border-white/10 hover:border-[#00F2FE]/40 text-slate-300 hover:text-white transition-all font-mono cursor-pointer active:scale-95 text-left"
-            >
-              {chip}
-            </button>
-          ))}
-        </div>
+        {/* Sugestões Rápidas: Desaparecem permanentemente assim que qualquer prompt for enviado */}
+        {!messages.some((m) => m.sender === "user") && dynamicSuggestions.length > 0 && (
+          <div className="px-3.5 py-2 border-t border-white/5 bg-[#080B11]/60 flex flex-wrap items-center gap-1.5 max-h-[96px] overflow-y-auto">
+            <span className="text-[10px] font-mono text-gray-400 uppercase mr-1 flex items-center gap-1 select-none shrink-0">
+              <Compass className="w-3 h-3 text-[#00F2FE]" />
+              Sugestões:
+            </span>
+            {dynamicSuggestions.map((chip, idx) => (
+              <button
+                key={idx}
+                onClick={() => sendMessage(chip.replace(/^[^\w\s]+/, "").trim())}
+                className="px-2.5 py-1 rounded-full text-[11px] bg-slate-900/90 hover:bg-slate-800 border border-white/10 hover:border-[#00F2FE]/40 text-slate-300 hover:text-white transition-all font-mono cursor-pointer active:scale-95 text-left"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Input Bar */}
         <div className="p-3 border-t border-white/10 bg-[#080B11]/80 flex items-center gap-2">
-          {/* Microfone */}
-          <button
-            onClick={toggleMic}
-            className={`p-2.5 rounded-xl border transition-colors cursor-pointer ${
-              isListening
-                ? "bg-[#10B981] border-[#10B981] text-black animate-pulse"
-                : "bg-white/5 border-white/10 text-gray-300 hover:text-white"
-            }`}
-            title="Falar pergunta por voz"
-          >
-            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-          </button>
-
           {/* Text Input */}
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            placeholder={isListening ? "Fale agora no microfone..." : "Pergunte sobre projetos, contatos ou me peça para navegar..."}
+            placeholder="Pergunte sobre projetos, contatos ou me peça para navegar..."
             className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#00F2FE]/60"
           />
 

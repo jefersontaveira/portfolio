@@ -38,7 +38,6 @@ export default function Home() {
   // Coordenação: o holograma viaja primeiro (850ms) e o modal só surge suavemente após ele pousar
   const [isHologramAtChat, setIsHologramAtChat] = useState(false);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
-  const [voiceActive, setVoiceActive] = useState(false);
   const [initialChatQuery, setInitialChatQuery] = useState("");
   const chatFlightTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -107,8 +106,6 @@ export default function Home() {
         {/* Barra de Navegação */}
         <Navbar
           onOpenExecutiveModal={() => setIsExecutiveModalOpen(true)}
-          voiceActive={voiceActive}
-          onToggleVoice={() => setVoiceActive(!voiceActive)}
           isJeffVisible={isJeffVisible}
           onToggleJeff={() => setIsJeffVisible(!isJeffVisible)}
         />
@@ -162,7 +159,6 @@ export default function Home() {
       <ExecutiveModal
         isOpen={isExecutiveModalOpen}
         onClose={() => setIsExecutiveModalOpen(false)}
-        voiceActive={voiceActive}
       />
     </div>
   );

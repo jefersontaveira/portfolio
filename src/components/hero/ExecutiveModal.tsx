@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { X, Sparkles, Download, Github, Linkedin, Mail, ExternalLink, CheckCircle2, Volume2 } from "lucide-react";
+import { X, Sparkles, Download, Github, Linkedin, Mail, ExternalLink, CheckCircle2 } from "lucide-react";
 import { DEVELOPER_PROFILE } from "@/lib/careerContext";
-import { SpeechManager } from "@/lib/speechHelper";
 
 interface ExecutiveModalProps {
   isOpen: boolean;
   onClose: () => void;
-  voiceActive: boolean;
+  voiceActive?: boolean;
 }
 
 export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
@@ -91,12 +90,6 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
 
   if (!isRendered) return null;
 
-  const handleReadSummary = () => {
-    SpeechManager.speak(
-      `Resumo Executivo de ${DEVELOPER_PROFILE.name}. ${DEVELOPER_PROFILE.role}. ${DEVELOPER_PROFILE.bio}. Principais tecnologias incluem Python, Django, FastAPI, PyTorch e ecossistemas web modernos com React e Docker.`
-    );
-  };
-
   return (
     <div 
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overscroll-contain transition-opacity duration-300 ease-out ${
@@ -144,13 +137,6 @@ export const ExecutiveModal: React.FC<ExecutiveModalProps> = ({
             <h3 className="text-xs uppercase font-mono tracking-wider text-gray-400">
               Síntese Profissional (TL;DR)
             </h3>
-            <button
-              onClick={handleReadSummary}
-              className="text-xs flex items-center gap-1 text-[#00F2FE] hover:underline font-mono"
-            >
-              <Volume2 className="w-3.5 h-3.5" />
-              <span>Ouvir Resumo</span>
-            </button>
           </div>
           <p className="text-sm text-gray-300 leading-relaxed bg-white/[0.02] p-4 rounded-xl border border-white/5">
             {DEVELOPER_PROFILE.bio}

@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
-import { Sparkles, RotateCcw, Cpu, Code2, Check, AlertCircle, Volume2 } from "lucide-react";
-import { SpeechManager } from "@/lib/speechHelper";
+import { Sparkles, RotateCcw, Cpu, Code2, Check, AlertCircle } from "lucide-react";
 import { getOnnxSession, runQuickDrawInference } from "@/lib/onnxInference";
 
 const CLASSES = [
@@ -266,15 +265,7 @@ export const MlVisionLab: React.FC = () => {
     }
   };
 
-  const handleVoiceNarration = () => {
-    if (predictions.length > 0) {
-      SpeechManager.speak(
-        `O modelo identificou seu desenho como ${predictions[0].name} com ${predictions[0].score}% de confiança.`
-      );
-    } else {
-      SpeechManager.speak("Desenhe no quadro ao lado para que a inteligência artificial faça a predição.");
-    }
-  };
+
 
   return (
     <div id="ia-lab" className="my-16 scroll-mt-20">
@@ -360,17 +351,10 @@ export const MlVisionLab: React.FC = () => {
               <div className="mt-3 flex items-center gap-3 w-full max-w-[280px]">
                 <button
                   onClick={clearCanvas}
-                  className="flex-1 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-xs font-mono flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-xs font-mono flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Limpar Tela</span>
-                </button>
-                <button
-                  onClick={handleVoiceNarration}
-                  className="p-2 rounded-xl bg-[#00F2FE]/10 hover:bg-[#00F2FE]/20 border border-[#00F2FE]/30 text-[#00F2FE] transition-colors"
-                  title="Ouvir predição por voz"
-                >
-                  <Volume2 className="w-4 h-4" />
                 </button>
               </div>
 

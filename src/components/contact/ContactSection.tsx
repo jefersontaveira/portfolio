@@ -12,11 +12,9 @@ import {
   ArrowUpRight,
   ShieldCheck,
   Clock,
-  MessageSquare,
-  Volume2
+  MessageSquare
 } from "lucide-react";
 import { DEVELOPER_PROFILE } from "@/lib/careerContext";
-import { SpeechManager } from "@/lib/speechHelper";
 
 // Ícone oficial SVG nítido do WhatsApp
 const WhatsAppIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
@@ -79,11 +77,7 @@ export const ContactSection: React.FC = () => {
     setTimeout(() => setCopiedAll(false), 2200);
   };
 
-  const handleVoiceIntroduction = () => {
-    SpeechManager.speak(
-      "Central de contatos de Jeferson Taveira. Você pode me chamar diretamente no WhatsApp, enviar um e-mail ou conectar pelo LinkedIn, GitHub e Instagram."
-    );
-  };
+
 
   const buildWhatsAppMessageUrl = () => {
     const baseText = `Olá Jeferson! Vi seu portfólio. Assunto: [${selectedTopic}]. ${quickMessage ? `Mensagem: ${quickMessage}` : "Gostaria de agendar uma conversa."}`;
@@ -190,14 +184,7 @@ export const ContactSection: React.FC = () => {
 
           {/* Botões Utilitários do Header (Alinhados com largura total e centralizados no mobile) */}
           <div className="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
-            <button
-              onClick={handleVoiceIntroduction}
-              className="w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 text-xs font-mono text-gray-300 flex items-center justify-center gap-2 transition-all cursor-pointer text-center"
-              title="Ouvir mensagem por voz"
-            >
-              <Volume2 className="w-4 h-4 text-[#00F2FE]" />
-              <span>Ouvir Apresentação</span>
-            </button>
+
 
             <button
               onClick={handleCopyAll}

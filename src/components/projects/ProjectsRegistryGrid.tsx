@@ -218,19 +218,6 @@ export const ProjectsRegistryGrid: React.FC = () => {
             </div>
           ))}
 
-          {/* Card Especial para Plug de Novos Projetos */}
-          <div className="rounded-2xl border border-dashed border-white/20 p-6 flex flex-col justify-center items-center text-center bg-white/[0.01] hover:border-[#38BDF8]/40 transition-colors">
-            <div className="w-10 h-10 rounded-full bg-[#38BDF8]/10 text-[#38BDF8] flex items-center justify-center mb-3">
-              <Code2 className="w-5 h-5" />
-            </div>
-            <h3 className="text-sm font-semibold text-white">
-              Arquitetura Pronta para Mais Projetos
-            </h3>
-            <p className="text-xs text-gray-400 mt-1 max-w-xs leading-relaxed">
-              Para plugar qualquer outro projeto que você já tenha criado, basta incluir um novo item no arquivo{" "}
-              <code className="text-[#38BDF8] font-mono">src/data/projectsRegistry.ts</code>.
-            </p>
-          </div>
         </div>
       </div>
     </section>
