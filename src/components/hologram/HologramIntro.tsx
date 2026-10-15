@@ -34,8 +34,8 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
     height: typeof window !== "undefined" ? window.innerHeight : 800,
   });
 
-  // Controle de transição e visibilidade inicial
-  const [greetingVisible, setGreetingVisible] = useState(false);
+  // Controle de transição e visibilidade inicial (Bem-vindo já inicia visível quando não acoplado)
+  const [greetingVisible, setGreetingVisible] = useState(() => !isDocked);
   const [hologramVisible, setHologramVisible] = useState(() => isDocked);
   const [isSystemActive, setIsSystemActive] = useState(false);
   const [typedMessage, setTypedMessage] = useState("");
@@ -63,20 +63,15 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
       return () => window.removeEventListener("resize", updateDimensions);
     }
 
-    // 1. Início: Saudação surge rapidamente (60ms)
-    const t1 = setTimeout(() => {
-      setGreetingVisible(true);
-    }, 60);
-
-    // 2. O texto fica na tela por 1s e esmaece
+    // 1. O texto de boas-vindas fica na tela e esmaece suavemente em 1.2s
     const t2 = setTimeout(() => {
       setGreetingVisible(false);
-    }, 1000);
+    }, 1200);
 
-    // 3. O holograma surge na tela em 1.4s com o botão Iniciar Sistema
+    // 2. O holograma surge na tela em 1.5s com o botão Iniciar Sistema
     const t3 = setTimeout(() => {
       setHologramVisible(true);
-    }, 1400);
+    }, 1500);
 
     // Trava qualquer barra de rolagem no navegador enquanto a introdução estiver ativa
     if (!isDocked) {
@@ -88,7 +83,6 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
     }
 
     return () => {
-      clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
       window.removeEventListener("resize", updateDimensions);
@@ -143,7 +137,7 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
     setTimeout(() => {
       SpeechManager.speak(
         welcomeVoiceText,
-        () => {},
+        () => { },
         () => {
           voiceFinished = true;
           if (typingFinished) {
@@ -406,15 +400,15 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
   const centralSize = isMobile
     ? Math.min(Math.round(dimensions.width * 0.96), Math.round(dimensions.height * 0.62), 480)
     : isTablet
-    ? Math.min(Math.round(dimensions.width * 0.72), Math.round(dimensions.height * 0.62), 520)
-    : Math.min(Math.round(dimensions.width * 0.55), Math.round(dimensions.height * 0.72), 660);
+      ? Math.min(Math.round(dimensions.width * 0.72), Math.round(dimensions.height * 0.62), 520)
+      : Math.min(Math.round(dimensions.width * 0.55), Math.round(dimensions.height * 0.72), 660);
 
   // Tamanho no canto inferior direito (Docked): aumentado no mobile para melhor visibilidade e toque
   const dockedSize = isMobile
     ? (dimensions.width < 380 ? 116 : 132)
     : isTablet
-    ? 130
-    : 160;
+      ? 130
+      : 160;
 
   // Margem simétrica diagonal
   const dockedMargin = isMobile
@@ -436,15 +430,13 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
       {!initialDockedRef.current && (
         <div
           suppressHydrationWarning
-          className={`fixed inset-0 z-40 bg-black transition-opacity duration-1000 ${
-            isDocked ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
-          }`}
+          className={`fixed inset-0 z-40 bg-black transition-opacity duration-1000 ${isDocked ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
+            }`}
         >
           {/* Saudação Inicial: Bem-vindo */}
           <div
-            className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-400 pointer-events-none px-4 text-center ${
-              greetingVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
-            }`}
+            className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-400 pointer-events-none px-4 text-center ${greetingVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+              }`}
           >
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] sm:tracking-[0.3em] text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]">
               Bem-vindo
@@ -462,23 +454,23 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
         style={{
           position: "fixed",
           zIndex: isChatOpen ? 60 : 50,
-          left: isChatOpen 
-            ? "50%" 
+          left: isChatOpen
+            ? "50%"
             : (isDocked ? `calc(100% - ${containerSize}px - ${dockedMargin})` : "50%"),
-          top: isChatOpen 
-            ? (isMobile ? "calc(50% - 40vh)" : "calc(50% - 300px)") 
+          top: isChatOpen
+            ? (isMobile ? "calc(50% - 40vh)" : "calc(50% - 300px)")
             : (isDocked ? `calc(100% - ${containerSize}px - ${dockedMargin})` : "50%"),
-          transform: isChatOpen 
-            ? "translate(-50%, -50%) scale(1)" 
-            : (isDocked 
-                ? (isJeffVisible ? "translate(0, 0) scale(1)" : "translate(0, 0) scale(0.7)") 
-                : "translate(-50%, -50%)"),
+          transform: isChatOpen
+            ? "translate(-50%, -50%) scale(1)"
+            : (isDocked
+              ? (isJeffVisible ? "translate(0, 0) scale(1)" : "translate(0, 0) scale(0.7)")
+              : "translate(-50%, -50%)"),
           width: `${containerSize}px`,
           height: `${containerSize}px`,
           aspectRatio: "1 / 1",
           transition: "all 0.85s cubic-bezier(0.25, 1, 0.5, 1)",
-          pointerEvents: isDocked 
-            ? (isJeffVisible ? "auto" : "none") 
+          pointerEvents: isDocked
+            ? (isJeffVisible ? "auto" : "none")
             : (hologramVisible ? "auto" : "none"),
         }}
         onClick={() => {
@@ -491,13 +483,11 @@ export const HologramIntro: React.FC<HologramIntroProps> = ({
           }
         }}
         title={isDocked ? (isChatOpen ? "Jeff • Clique para fechar o chat" : "Jeff • Clique para conversar com a IA") : undefined}
-        className={`flex items-center justify-center select-none shrink-0 ${
-          isDocked && isJeffVisible ? "cursor-pointer" : "pointer-events-none"
-        } ${
-          isDocked
+        className={`flex items-center justify-center select-none shrink-0 ${isDocked && isJeffVisible ? "cursor-pointer" : "pointer-events-none"
+          } ${isDocked
             ? (isChatOpen || isJeffVisible ? "opacity-100" : "opacity-0")
             : (!hologramVisible ? "opacity-0" : "opacity-100")
-        } transition-opacity duration-700`}
+          } transition-opacity duration-700`}
       >
         <canvas
           ref={canvasRef}

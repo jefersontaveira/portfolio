@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Terminal, Volume2, VolumeX, Sparkles, FileText, Menu, X, Code2, Radio } from "lucide-react";
 import { SpeechManager } from "@/lib/speechHelper";
 
@@ -19,7 +19,26 @@ export const Navbar: React.FC<NavbarProps> = ({
   isJeffVisible = true,
   onToggleJeff,
 }) => {
+  const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Helper para renderizar ícones com segurança após montagem (evita erros de hidratação causados por extensões como DarkReader)
+  const SafeIcon = ({
+    icon: Icon,
+    className,
+  }: {
+    icon: React.ComponentType<{ className?: string }>;
+    className?: string;
+  }) => {
+    if (!mounted) {
+      return <span className={`inline-block shrink-0 ${className || ""}`} aria-hidden="true" />;
+    }
+    return <Icon className={className} />;
+  };
 
   const handleVoiceToggle = () => {
     onToggleVoice();
@@ -55,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Brand / Logo */}
         <a href="#hero" className="flex items-center gap-2 group">
           <div suppressHydrationWarning className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#00F2FE]/20 to-[#A855F7]/20 border border-[#00F2FE]/30 flex items-center justify-center text-[#00F2FE] group-hover:border-[#00F2FE] transition-colors">
-            <Terminal className="w-5 h-5" />
+            <SafeIcon icon={Terminal} className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-1.5 font-bold text-sm sm:text-base tracking-tight text-white group-hover:text-[#00F2FE] transition-colors">
@@ -94,7 +113,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   : "bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20"
               }`}
             >
-              <Radio className={`w-3.5 h-3.5 ${isJeffVisible ? "animate-pulse text-[#00F2FE]" : "text-gray-400"}`} />
+              <SafeIcon icon={Radio} className={`w-3.5 h-3.5 ${isJeffVisible ? "animate-pulse text-[#00F2FE]" : "text-gray-400"}`} />
               <span>{isJeffVisible ? "Jeff ON" : "Jeff OFF"}</span>
             </button>
           )}
@@ -109,7 +128,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 : "bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20"
             }`}
           >
-            {voiceActive ? <Volume2 className="w-4 h-4 animate-pulse" /> : <VolumeX className="w-4 h-4" />}
+            <SafeIcon icon={voiceActive ? Volume2 : VolumeX} className={`w-4 h-4 ${voiceActive ? "animate-pulse" : ""}`} />
             <span className="font-mono text-[11px] hidden lg:inline">
               {voiceActive ? "Voz ON" : "Voz OFF"}
             </span>
@@ -120,7 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenExecutiveModal}
             className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#00F2FE]/10 to-[#A855F7]/10 border border-[#00F2FE]/30 hover:border-[#00F2FE] text-white text-xs font-medium flex items-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#00F2FE]" />
+            <SafeIcon icon={Sparkles} className="w-3.5 h-3.5 text-[#00F2FE]" />
             <span>Modo Executivo</span>
             <span className="text-[10px] text-gray-400 font-mono bg-white/5 px-1 rounded">1 min</span>
           </button>
@@ -132,7 +151,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             rel="noopener noreferrer"
             className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-white/25 text-gray-200 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-all"
           >
-            <FileText className="w-3.5 h-3.5 text-gray-400" />
+            <SafeIcon icon={FileText} className="w-3.5 h-3.5 text-gray-400" />
             <span>Currículo</span>
           </a>
         </div>
@@ -143,7 +162,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="md:hidden p-2 text-gray-400 hover:text-white focus:outline-none"
           aria-label="Menu principal"
         >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          <SafeIcon icon={mobileMenuOpen ? X : Menu} className="w-6 h-6" />
         </button>
       </div>
 
@@ -159,7 +178,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center justify-between pb-5 border-b border-white/10 shrink-0">
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#00F2FE]/20 to-[#A855F7]/20 border border-[#00F2FE]/30 flex items-center justify-center text-[#00F2FE]">
-                <Terminal className="w-5 h-5" />
+                <SafeIcon icon={Terminal} className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5 font-bold text-base text-white">
@@ -176,7 +195,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white transition-colors"
               aria-label="Fechar menu"
             >
-              <X className="w-6 h-6" />
+              <SafeIcon icon={X} className="w-6 h-6" />
             </button>
           </div>
 
@@ -217,7 +236,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#00F2FE]/20 to-[#A855F7]/20 border border-[#00F2FE]/40 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#00F2FE]/30 transition-all active:scale-[0.98]"
             >
-              <Sparkles className="w-4 h-4 text-[#00F2FE]" />
+              <SafeIcon icon={Sparkles} className="w-4 h-4 text-[#00F2FE]" />
               <span>Modo Executivo Rápido (1 Minuto)</span>
             </button>
 
@@ -230,7 +249,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     : "bg-white/5 border-white/10 text-gray-400"
                 }`}
               >
-                <Radio className={`w-4 h-4 ${isJeffVisible ? "animate-pulse text-[#00F2FE]" : "text-gray-400"}`} />
+                <SafeIcon icon={Radio} className={`w-4 h-4 ${isJeffVisible ? "animate-pulse text-[#00F2FE]" : "text-gray-400"}`} />
                 <span>{isJeffVisible ? "Assistente Jeff: Ativo (Toque para Ocultar)" : "Assistente Jeff: Oculto (Toque para Exibir)"}</span>
               </button>
             )}
@@ -243,7 +262,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   : "bg-white/5 border-white/10 text-gray-400"
               }`}
             >
-              {voiceActive ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              <SafeIcon icon={voiceActive ? Volume2 : VolumeX} className="w-4 h-4" />
               <span>{voiceActive ? "Voz Jeff Ativada (ON)" : "Voz Jeff Desativada (OFF)"}</span>
             </button>
 
@@ -253,7 +272,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               rel="noopener noreferrer"
               className="w-full py-3.5 px-4 rounded-xl bg-white/5 border border-white/10 text-gray-200 hover:text-white text-sm font-medium flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             >
-              <FileText className="w-4 h-4 text-gray-400" />
+              <SafeIcon icon={FileText} className="w-4 h-4 text-gray-400" />
               <span>Baixar Currículo (PDF)</span>
             </a>
           </div>

@@ -363,14 +363,24 @@ export default function ClassificadorDesenhosPage() {
             Rede Neural Convolucional completa desenvolvida em <strong>Python com PyTorch</strong>, treinada sobre o dataset oficial <em>Google Quick, Draw!</em> e executada diretamente no navegador com inferência instantânea (&lt; 6ms).
           </p>
 
-          <div className="flex flex-wrap gap-2 pt-2">
-            {["PyTorch", "Python 3.12", "Convolutional Neural Network", "ONNX Runtime", "WebAssembly", "Dataset QuickDraw", "TypeScript", "Canvas API"].map((tech) => (
-              <span
-                key={tech}
-                className="text-xs font-mono px-3 py-1 rounded-lg bg-white/[0.04] border border-white/10 text-gray-300"
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+            {[
+              { label: "PyTorch 2.0+", icon: "🔥" },
+              { label: "Python 3.12", icon: "🐍" },
+              { label: "CNN Deep Learning", icon: "🧠" },
+              { label: "ONNX Runtime Web", icon: "⚡" },
+              { label: "WebAssembly (WASM)", icon: "⚙️" },
+              { label: "Google QuickDraw", icon: "🎨" },
+              { label: "TypeScript", icon: "🔷" },
+              { label: "HTML5 Canvas API", icon: "🖌️" },
+            ].map((tech) => (
+              <div
+                key={tech.label}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 text-gray-300 text-xs font-mono transition-colors"
               >
-                {tech}
-              </span>
+                <span className="text-sm shrink-0">{tech.icon}</span>
+                <span className="truncate">{tech.label}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -401,39 +411,38 @@ export default function ClassificadorDesenhosPage() {
             </div>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             {/* Coluna do Canvas Expandido */}
-            <div className="lg:col-span-6 flex flex-col items-center">
-              <div className="w-full max-w-[420px] flex items-center justify-between text-xs text-gray-400 mb-2.5 font-mono">
+            <div className="md:col-span-1 lg:col-span-6 flex flex-col items-center w-full">
+              <div className="w-full max-w-[420px] flex items-center justify-between text-xs text-gray-400 mb-2 font-mono">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#00F2FE] animate-pulse" />
-                  <span>Quadro de Desenho (420x420px)</span>
+                  <span>Quadro de Desenho</span>
                 </span>
-                <span className="text-[#00F2FE]">Mouse & Touch Ativos</span>
+                <span className="text-[#00F2FE] text-[11px]">Mouse & Touch Ativos</span>
               </div>
 
-              {/* Seletor de Espessura do Pincel */}
-              <div className="w-full max-w-[420px] mb-3 flex items-center justify-between p-1.5 rounded-xl bg-white/[0.04] border border-white/10">
-                <span className="text-[11px] font-mono text-gray-400 pl-2">Espessura da linha:</span>
+              {/* Seletor de Espessura do Traço */}
+              <div className="w-full max-w-[420px] mb-2.5 flex items-center justify-between p-1 rounded-xl bg-white/[0.04] border border-white/10">
+                <span className="text-[11px] font-mono text-gray-400 pl-2.5 shrink-0">Traço:</span>
                 <div className="flex items-center gap-1">
                   {[
-                    { label: "Fina", size: 4, dotSize: 3 },
-                    { label: "Média (Padrão)", size: 7, dotSize: 6 },
-                    { label: "Firme", size: 11, dotSize: 9 },
+                    { label: "Fino", size: 4, width: "w-2.5", height: "h-0.5" },
+                    { label: "Médio", size: 7, width: "w-3", height: "h-1" },
+                    { label: "Grosso", size: 11, width: "w-3.5", height: "h-1.5" },
                   ].map((opt) => (
                     <button
                       key={opt.size}
                       type="button"
                       onClick={() => setBrushSize(opt.size)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
                         brushSize === opt.size
                           ? "bg-[#00F2FE] text-black font-bold shadow-[0_0_12px_rgba(0,242,254,0.4)]"
                           : "text-gray-400 hover:text-white hover:bg-white/5"
                       }`}
                     >
                       <span
-                        className="rounded-full bg-current block"
-                        style={{ width: opt.dotSize, height: opt.dotSize }}
+                        className={`${opt.width} ${opt.height} rounded-full bg-current block shrink-0`}
                       />
                       <span>{opt.label}</span>
                     </button>
@@ -441,7 +450,7 @@ export default function ClassificadorDesenhosPage() {
                 </div>
               </div>
 
-              <div className="relative w-full max-w-[420px] aspect-square border-2 border-[#00F2FE]/40 rounded-2xl overflow-hidden bg-black shadow-[0_0_35px_rgba(0,242,254,0.18)]">
+              <div className="relative w-full max-w-[340px] sm:max-w-[380px] md:max-w-[420px] aspect-square border-2 border-[#00F2FE]/40 rounded-2xl overflow-hidden bg-black shadow-[0_0_35px_rgba(0,242,254,0.18)]">
                 <canvas
                   ref={canvasRef}
                   width={420}
@@ -460,17 +469,49 @@ export default function ClassificadorDesenhosPage() {
                 {!hasDrawn && (
                   <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center text-center p-6">
                     <p className="text-sm font-medium text-gray-300 font-mono leading-relaxed">
-                      Área de desenho expandida
+                      Área de desenho interativa
                     </p>
-                    <p className="text-xs text-gray-500 font-mono mt-2 max-w-[280px]">
+                    <p className="text-xs text-gray-500 font-mono mt-2 max-w-[260px]">
                       Desenhe livremente: carro, avião, maçã, gato, peixe, estrela, árvore ou guarda-chuva...
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* Botões do Canvas */}
-              <div className="mt-3.5 flex items-center gap-3 w-full max-w-[420px]">
+              {/* Card de Predição Imediata em Tempo Real (Visível sem rolar a página) */}
+              <div className="w-full max-w-[420px] mt-3 p-3 rounded-xl bg-gradient-to-r from-[#00F2FE]/15 via-[#38BDF8]/10 to-[#A855F7]/15 border border-[#00F2FE]/40 shadow-[0_0_20px_rgba(0,242,254,0.12)] flex items-center justify-between transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#00F2FE]/20 border border-[#00F2FE]/40 flex items-center justify-center text-2xl shrink-0 shadow-[0_0_12px_rgba(0,242,254,0.3)]">
+                    {predictions.length > 0 ? predictions[0].icon : "✏️"}
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-mono text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className={`w-1.5 h-1.5 rounded-full ${predictions.length > 0 ? "bg-[#10B981] animate-pulse" : "bg-gray-500"}`} />
+                      <span>{predictions.length > 0 ? "IA Detectou:" : "Aguardando traço..."}</span>
+                    </div>
+                    <div className="text-sm sm:text-base font-bold font-mono text-white flex items-center gap-2">
+                      <span>{predictions.length > 0 ? predictions[0].name : "Desenhe no quadro"}</span>
+                      {predictions.length > 0 && (
+                        <span className="text-xs px-2 py-0.5 rounded-md bg-[#00F2FE]/20 text-[#00F2FE] border border-[#00F2FE]/30">
+                          {predictions[0].score}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {predictions.length > 1 && (
+                  <div className="text-right pl-3 border-l border-white/10 hidden min-[380px]:block">
+                    <div className="text-[10px] font-mono text-gray-400">2ª opção:</div>
+                    <div className="text-xs font-mono text-gray-300 font-medium">
+                      {predictions[1].icon} {predictions[1].name} <span className="text-gray-400">({predictions[1].score}%)</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Botões do Canvas & Tensor Compacto Integrado */}
+              <div className="mt-3 flex items-center gap-2 w-full max-w-[420px]">
                 <button
                   onClick={clearCanvas}
                   className="flex-1 py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-200 hover:text-white text-xs font-mono font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
@@ -486,32 +527,27 @@ export default function ClassificadorDesenhosPage() {
                   <Volume2 className="w-4 h-4" />
                   <span className="hidden sm:inline">Ouvir Voz</span>
                 </button>
-              </div>
-
-              {/* HUD do Tensor 28x28 */}
-              <div className="mt-3.5 w-full max-w-[420px] flex items-center justify-between p-3.5 rounded-xl bg-[#080B11]/90 border border-[#00F2FE]/25">
-                <div className="flex items-center gap-2.5">
+                {/* Tensor Preview Compacto integrado */}
+                <div
+                  className="flex items-center gap-1.5 p-1.5 px-2.5 rounded-xl bg-[#080B11] border border-[#00F2FE]/30 shrink-0"
+                  title="Tensor 28x28 processado pela rede neural"
+                >
                   <canvas
                     ref={previewCanvasRef}
                     width={28}
                     height={28}
-                    className="w-9 h-9 rounded-md border border-[#00F2FE]/60 bg-black block shrink-0 shadow-[0_0_10px_rgba(0,242,254,0.25)]"
+                    className="w-6 h-6 rounded border border-[#00F2FE]/50 bg-black block"
                     style={{ imageRendering: "pixelated" }}
                   />
-                  <div>
-                    <div className="text-[10px] font-mono text-gray-400">Tensor Pré-processado</div>
-                    <div className="text-xs font-mono text-[#00F2FE] font-bold">[1, 1, 28, 28]</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-[10px] font-mono text-gray-400">Pipeline</div>
-                  <div className="text-[10px] font-mono text-[#10B981] font-semibold">PyTorch CNN</div>
+                  <span className="text-[10px] font-mono text-[#00F2FE] font-bold hidden min-[360px]:inline">
+                    28x28
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Coluna das Predições */}
-            <div className="lg:col-span-6 flex flex-col justify-between h-full bg-[#080B11]/70 p-6 sm:p-7 rounded-2xl border border-white/10">
+            {/* Coluna das Predições Completas */}
+            <div className="md:col-span-1 lg:col-span-6 flex flex-col justify-between h-full bg-[#080B11]/70 p-6 sm:p-7 rounded-2xl border border-white/10 w-full">
               <div>
                 <div className="flex items-center justify-between pb-3 border-b border-white/10">
                   <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Distribuição Softmax de Probabilidades</span>
@@ -668,44 +704,51 @@ export default function ClassificadorDesenhosPage() {
           {/* ============================================================== */}
           {/* VISUALIZADOR DE CÓDIGO PYTHON REAL DO REPOSITÓRIO */}
           {/* ============================================================== */}
-          <div className="p-6 sm:p-8 rounded-2xl bg-[#0F172A]/60 border border-white/10 space-y-4">
+          <div className="p-4 sm:p-8 rounded-2xl bg-[#0F172A]/60 border border-white/10 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <Code2 className="w-5 h-5 text-[#00F2FE]" />
-                <h3 className="text-lg font-bold text-white">Código Fonte do Repositório (PyTorch)</h3>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#00F2FE]/10 border border-[#00F2FE]/30 text-[#00F2FE] flex items-center justify-center shrink-0">
+                  <Code2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                    Código Fonte do Repositório
+                  </h3>
+                  <p className="text-xs font-mono text-[#00F2FE]">PyTorch nn.Module & Pipeline</p>
+                </div>
               </div>
 
-              {/* Tabs de Código */}
-              <div className="flex items-center gap-1.5 bg-[#080B11] p-1 rounded-xl border border-white/10">
+              {/* Tabs de Código (Responsivo no mobile com grid 3 colunas e 100% preservado no PC) */}
+              <div className="w-full sm:w-auto grid grid-cols-3 sm:flex sm:items-center sm:justify-start gap-1 sm:gap-1.5 bg-[#080B11] p-1 sm:p-1.5 rounded-xl border border-white/10">
                 <button
                   onClick={() => setActiveCodeTab("model")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+                  className={`w-full sm:w-auto flex items-center justify-center px-1 min-[380px]:px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] min-[380px]:text-[11px] sm:text-xs font-mono transition-all text-center whitespace-nowrap cursor-pointer ${
                     activeCodeTab === "model"
-                      ? "bg-[#00F2FE]/20 text-[#00F2FE] border border-[#00F2FE]/30"
+                      ? "bg-[#00F2FE]/20 text-[#00F2FE] border border-[#00F2FE]/30 font-semibold"
                       : "text-gray-400 hover:text-white"
                   }`}
                 >
-                  src/model.py
+                  <span className="hidden min-[360px]:inline">src/</span>model.py
                 </button>
                 <button
                   onClick={() => setActiveCodeTab("train")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+                  className={`w-full sm:w-auto flex items-center justify-center px-1 min-[380px]:px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] min-[380px]:text-[11px] sm:text-xs font-mono transition-all text-center whitespace-nowrap cursor-pointer ${
                     activeCodeTab === "train"
-                      ? "bg-[#38BDF8]/20 text-[#38BDF8] border border-[#38BDF8]/30"
+                      ? "bg-[#38BDF8]/20 text-[#38BDF8] border border-[#38BDF8]/30 font-semibold"
                       : "text-gray-400 hover:text-white"
                   }`}
                 >
-                  src/train.py
+                  <span className="hidden min-[360px]:inline">src/</span>train.py
                 </button>
                 <button
                   onClick={() => setActiveCodeTab("dataset")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+                  className={`w-full sm:w-auto flex items-center justify-center px-1 min-[380px]:px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] min-[380px]:text-[11px] sm:text-xs font-mono transition-all text-center whitespace-nowrap cursor-pointer ${
                     activeCodeTab === "dataset"
-                      ? "bg-[#A855F7]/20 text-[#A855F7] border border-[#A855F7]/30"
+                      ? "bg-[#A855F7]/20 text-[#A855F7] border border-[#A855F7]/30 font-semibold"
                       : "text-gray-400 hover:text-white"
                   }`}
                 >
-                  src/dataset.py
+                  <span className="hidden min-[360px]:inline">src/</span>dataset.py
                 </button>
               </div>
             </div>
@@ -713,7 +756,7 @@ export default function ClassificadorDesenhosPage() {
             {/* Código Tab 1: model.py */}
             {activeCodeTab === "model" && (
               <div className="bg-[#080B11] p-4 sm:p-5 rounded-xl border border-white/10 overflow-x-auto">
-                <div className="text-[11px] font-mono text-gray-400 pb-2 mb-2 border-b border-white/5 flex justify-between">
+                <div className="text-[11px] font-mono text-gray-400 pb-2 mb-2 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <span>src/model.py — QuickDrawCNN Architecture</span>
                   <span className="text-[#00F2FE]">PyTorch nn.Module</span>
                 </div>
@@ -765,7 +808,7 @@ class QuickDrawCNN(nn.Module):
             {/* Código Tab 2: train.py */}
             {activeCodeTab === "train" && (
               <div className="bg-[#080B11] p-4 sm:p-5 rounded-xl border border-white/10 overflow-x-auto">
-                <div className="text-[11px] font-mono text-gray-400 pb-2 mb-2 border-b border-white/5 flex justify-between">
+                <div className="text-[11px] font-mono text-gray-400 pb-2 mb-2 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <span>src/train.py — Training & Backpropagation Loop</span>
                   <span className="text-[#38BDF8]">Adam Optimizer + CrossEntropyLoss</span>
                 </div>
@@ -805,7 +848,7 @@ class QuickDrawCNN(nn.Module):
             {/* Código Tab 3: dataset.py */}
             {activeCodeTab === "dataset" && (
               <div className="bg-[#080B11] p-4 sm:p-5 rounded-xl border border-white/10 overflow-x-auto">
-                <div className="text-[11px] font-mono text-gray-400 pb-2 mb-2 border-b border-white/5 flex justify-between">
+                <div className="text-[11px] font-mono text-gray-400 pb-2 mb-2 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <span>src/dataset.py — QuickDraw Dataset Loader</span>
                   <span className="text-[#A855F7]">PyTorch Dataset</span>
                 </div>
@@ -840,21 +883,25 @@ class QuickDrawDataset(Dataset):
         </section>
 
         {/* Rodapé da Página Dedicada */}
-        <footer className="pt-8 pb-12 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-gray-400">
+        <footer className="pt-8 pb-20 sm:pb-12 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-gray-400 text-center sm:text-left">
           <div>
-            Projeto de <strong className="text-white">Jeferson Taveira</strong> • Engenharia de Software, IA & Python
+            Projeto de <strong className="text-white font-semibold">Jeferson Taveira</strong>
+            <span className="hidden sm:inline"> • </span>
+            <span className="block sm:inline text-gray-400 mt-1 sm:mt-0">Engenharia de Software, IA & Python</span>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/" className="hover:text-[#00F2FE] transition-colors">
+          <div className="flex items-center justify-center gap-6">
+            <Link href="/" className="hover:text-[#00F2FE] text-gray-300 transition-colors py-1">
               Página Principal
             </Link>
+            <span className="text-white/20">•</span>
             <a
               href="https://github.com/jefersontaveira/classificador_de_desenhos"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#00F2FE] transition-colors"
+              className="hover:text-[#00F2FE] text-gray-300 transition-colors py-1 flex items-center gap-1.5"
             >
-              Repositório no GitHub
+              <span>Repositório no GitHub</span>
+              <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
             </a>
           </div>
         </footer>

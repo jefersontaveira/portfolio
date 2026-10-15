@@ -141,13 +141,6 @@ export default function ArenaSandboxWindow() {
 
   const isLowTime = secondsLeft <= 3 * 60; // Menos de 3 minutos
 
-  const switchView = (view: SandboxView) => {
-    setCurrentView(view);
-    if (iframeRef.current) {
-      iframeRef.current.src = viewUrls[view];
-    }
-  };
-
   return (
     <div className="h-screen w-screen bg-[#070913] text-white flex flex-col overflow-hidden font-sans">
       {/* BARRA SUPERIOR DE CONTROLE SANDBOX (HUD 20 MIN) */}

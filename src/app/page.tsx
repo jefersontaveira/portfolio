@@ -15,10 +15,22 @@ import { OrbChatModal } from "@/components/orb/OrbChatModal";
 import { ExecutiveModal } from "@/components/hero/ExecutiveModal";
 import { isPortfolioInitialized, setPortfolioInitialized } from "@/lib/portfolioSession";
 
-// Importação dinâmica com ssr: false para eliminar qualquer erro de hidratação (extensões, SVG, window)
+// Importação dinâmica com fallback seguro de SSR para o Bem-vindo aparecer imediatamente
 const HologramIntro = dynamic(
   () => import("@/components/hologram/HologramIntro").then((mod) => mod.HologramIntro),
-  { ssr: false }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="fixed inset-0 z-40 bg-black flex flex-col items-center justify-center pointer-events-auto">
+        <div className="flex flex-col items-center justify-center px-4 text-center">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-light tracking-[0.2em] sm:tracking-[0.3em] text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]">
+            Bem-vindo
+          </h1>
+          <div className="w-14 sm:w-16 h-0.5 bg-gradient-to-r from-transparent via-[#00F2FE] to-transparent mt-4 sm:mt-5 opacity-70 animate-pulse" />
+        </div>
+      </div>
+    ),
+  }
 );
 
 export default function Home() {
@@ -89,38 +101,44 @@ export default function Home() {
         <div className="absolute -bottom-32 right-[5%] w-[700px] h-[550px] bg-gradient-to-tl from-[#10B981]/12 via-[#00F2FE]/06 to-transparent blur-[160px] rounded-full" />
       </div>
 
-      {/* Barra de Navegação */}
-      <Navbar
-        onOpenExecutiveModal={() => setIsExecutiveModalOpen(true)}
-        voiceActive={voiceActive}
-        onToggleVoice={() => setVoiceActive(!voiceActive)}
-        isJeffVisible={isJeffVisible}
-        onToggleJeff={() => setIsJeffVisible(!isJeffVisible)}
-      />
-
-      {/* Conteúdo Principal do Portfólio */}
-      <main className="flex-1">
-        {/* Seção Hero */}
-        <HeroSection
+      {/* Conteúdo Principal do Portfólio (Revelado suavemente somente após iniciar o sistema ou em sessões já ativas) */}
+      <div
+        className={`flex-1 flex flex-col transition-opacity duration-1000 ${
+          portfolioOpen ? "opacity-100" : "opacity-0 pointer-events-none select-none"
+        }`}
+      >
+        {/* Barra de Navegação */}
+        <Navbar
           onOpenExecutiveModal={() => setIsExecutiveModalOpen(true)}
-          onOpenChat={() => handleOpenChat()}
+          voiceActive={voiceActive}
+          onToggleVoice={() => setVoiceActive(!voiceActive)}
+          isJeffVisible={isJeffVisible}
+          onToggleJeff={() => setIsJeffVisible(!isJeffVisible)}
         />
 
-        {/* Vitrine Modular de Projetos */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ProjectsRegistryGrid />
-        </div>
+        {/* Conteúdo Principal do Portfólio */}
+        <main className="flex-1">
+          {/* Seção Hero */}
+          <HeroSection
+            onOpenExecutiveModal={() => setIsExecutiveModalOpen(true)}
+            onOpenChat={() => handleOpenChat()}
+          />
 
-        {/* Seção Sobre Mim (Trajetória, Foto & Pilares de Engenharia) */}
-        <AboutSection />
+          {/* Vitrine Modular de Projetos */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <ProjectsRegistryGrid />
+          </div>
 
-        {/* Seção de Contato e Conexões Diretas (Última Seção) */}
-        <ContactSection />
-      </main>
+          {/* Seção Sobre Mim (Trajetória, Foto & Pilares de Engenharia) */}
+          <AboutSection />
 
+          {/* Seção de Contato e Conexões Diretas (Última Seção) */}
+          <ContactSection />
+        </main>
 
-      {/* Rodapé */}
-      <Footer />
+        {/* Rodapé */}
+        <Footer />
+      </div>
 
       {/* Holograma Interativo Permanente (Intro no Centro -> Transição Suave para Canto Inferior Direito) */}
       <HologramIntro

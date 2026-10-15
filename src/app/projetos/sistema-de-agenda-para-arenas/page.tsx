@@ -61,24 +61,26 @@ export default function ArenaSaasOverviewPage() {
 
       {/* Header de Navegação */}
       <header className="border-b border-white/5 bg-[#080B1A]/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
           <Link
             href="/#projetos"
-            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors group"
+            className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-400 hover:text-white transition-colors group shrink-0"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Voltar ao Portfólio</span>
+            <span className="hidden sm:inline">Voltar ao Portfólio</span>
+            <span className="sm:hidden font-medium">Voltar</span>
           </Link>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-purple-500/10 border border-purple-500/20 text-purple-300">
-              <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-              <span>SaaS Multi-Tenant • Django 4.2</span>
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-mono bg-purple-500/10 border border-purple-500/20 text-purple-300 whitespace-nowrap">
+              <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-purple-400 animate-pulse" />
+              <span className="hidden sm:inline">SaaS Multi-Tenant • </span>
+              <span>Django 4.2</span>
             </div>
 
             {serverOnline !== null && (
               <span
-                className={`text-xs px-2.5 py-1 rounded-md font-mono flex items-center gap-1.5 ${
+                className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-md font-mono flex items-center gap-1.5 whitespace-nowrap ${
                   serverOnline
                     ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                     : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
@@ -89,7 +91,12 @@ export default function ArenaSaasOverviewPage() {
                     serverOnline ? "bg-emerald-400" : "bg-amber-400"
                   }`}
                 />
-                {serverOnline ? "Sandbox Online (Porta 8000)" : "Servidor Local Standby"}
+                <span className="hidden sm:inline">
+                  {serverOnline ? "Sandbox Online (Porta 8000)" : "Servidor Local Standby"}
+                </span>
+                <span className="sm:hidden">
+                  {serverOnline ? "Sandbox Online" : "Standby"}
+                </span>
               </span>
             )}
           </div>
@@ -97,9 +104,9 @@ export default function ArenaSaasOverviewPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full space-y-12">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full space-y-8 sm:space-y-12">
         {/* Banner de Aviso de Versão Teste & Futura Implantação */}
-        <div className="relative overflow-hidden rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-[#10142E] to-cyan-950/30 p-6 md:p-8 backdrop-blur-md">
+        <div className="relative overflow-hidden rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-[#10142E] to-cyan-950/30 p-5 sm:p-8 backdrop-blur-md">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-2 max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold">
@@ -134,9 +141,9 @@ export default function ArenaSaasOverviewPage() {
         </div>
 
         {/* Regras e Parâmetros do Sandbox (20 min + 1 Arena + Reset) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="p-5 rounded-xl border border-white/5 bg-slate-900/40 backdrop-blur-sm flex items-start gap-4">
-            <div className="p-2.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          <div className="p-4 sm:p-5 rounded-xl border border-white/5 bg-slate-900/40 backdrop-blur-sm flex items-start gap-4">
+            <div className="p-2.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
               <Clock className="w-5 h-5" />
             </div>
             <div className="space-y-1">
@@ -147,8 +154,8 @@ export default function ArenaSaasOverviewPage() {
             </div>
           </div>
 
-          <div className="p-5 rounded-xl border border-white/5 bg-slate-900/40 backdrop-blur-sm flex items-start gap-4">
-            <div className="p-2.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+          <div className="p-4 sm:p-5 rounded-xl border border-white/5 bg-slate-900/40 backdrop-blur-sm flex items-start gap-4">
+            <div className="p-2.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shrink-0">
               <Building2 className="w-5 h-5" />
             </div>
             <div className="space-y-1">
@@ -159,8 +166,8 @@ export default function ArenaSaasOverviewPage() {
             </div>
           </div>
 
-          <div className="p-5 rounded-xl border border-white/5 bg-slate-900/40 backdrop-blur-sm flex items-start gap-4">
-            <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <div className="p-4 sm:p-5 rounded-xl border border-white/5 bg-slate-900/40 backdrop-blur-sm flex items-start gap-4">
+            <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
               <RotateCcw className="w-5 h-5" />
             </div>
             <div className="space-y-1">
@@ -172,48 +179,52 @@ export default function ArenaSaasOverviewPage() {
           </div>
         </div>
 
-        {/* Abas Explicativas de Arquitetura e Funcionalidades */}
+        {/* Abas Explicativas de Arquitetura e Funcionalidades (Sem barra horizontal, em grid no mobile e flex no PC) */}
         <div className="space-y-6">
-          <div className="flex border-b border-white/10 gap-2 sm:gap-4 overflow-x-auto pb-1">
+          <div className="grid grid-cols-2 sm:flex sm:border-b sm:border-white/10 gap-2 sm:gap-4 pb-1">
             <button
               onClick={() => setActiveTab("visao-geral")}
-              className={`pb-3 px-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap cursor-pointer ${
+              className={`p-3 sm:p-0 sm:pb-3 sm:px-3 rounded-xl sm:rounded-none text-xs sm:text-sm font-medium transition-all text-center sm:text-left cursor-pointer border sm:border-0 sm:border-b-2 whitespace-normal sm:whitespace-nowrap ${
                 activeTab === "visao-geral"
-                  ? "border-purple-500 text-purple-400"
-                  : "border-transparent text-slate-400 hover:text-white"
+                  ? "bg-purple-500/20 border-purple-500/50 text-purple-300 font-semibold shadow-[0_0_15px_rgba(168,85,247,0.2)] sm:bg-transparent sm:shadow-none sm:border-purple-500 sm:text-purple-400"
+                  : "bg-slate-900/40 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800/40 sm:bg-transparent sm:border-transparent"
               }`}
             >
-              Visão Geral do Sistema
+              <span className="sm:hidden">Visão Geral</span>
+              <span className="hidden sm:inline">Visão Geral do Sistema</span>
             </button>
             <button
               onClick={() => setActiveTab("arquitetura")}
-              className={`pb-3 px-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap cursor-pointer ${
+              className={`p-3 sm:p-0 sm:pb-3 sm:px-3 rounded-xl sm:rounded-none text-xs sm:text-sm font-medium transition-all text-center sm:text-left cursor-pointer border sm:border-0 sm:border-b-2 whitespace-normal sm:whitespace-nowrap ${
                 activeTab === "arquitetura"
-                  ? "border-purple-500 text-purple-400"
-                  : "border-transparent text-slate-400 hover:text-white"
+                  ? "bg-purple-500/20 border-purple-500/50 text-purple-300 font-semibold shadow-[0_0_15px_rgba(168,85,247,0.2)] sm:bg-transparent sm:shadow-none sm:border-purple-500 sm:text-purple-400"
+                  : "bg-slate-900/40 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800/40 sm:bg-transparent sm:border-transparent"
               }`}
             >
-              Arquitetura Multi-Tenant & Backend
+              <span className="sm:hidden">Arquitetura SaaS</span>
+              <span className="hidden sm:inline">Arquitetura Multi-Tenant & Backend</span>
             </button>
             <button
               onClick={() => setActiveTab("seguranca")}
-              className={`pb-3 px-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap cursor-pointer ${
+              className={`p-3 sm:p-0 sm:pb-3 sm:px-3 rounded-xl sm:rounded-none text-xs sm:text-sm font-medium transition-all text-center sm:text-left cursor-pointer border sm:border-0 sm:border-b-2 whitespace-normal sm:whitespace-nowrap ${
                 activeTab === "seguranca"
-                  ? "border-purple-500 text-purple-400"
-                  : "border-transparent text-slate-400 hover:text-white"
+                  ? "bg-purple-500/20 border-purple-500/50 text-purple-300 font-semibold shadow-[0_0_15px_rgba(168,85,247,0.2)] sm:bg-transparent sm:shadow-none sm:border-purple-500 sm:text-purple-400"
+                  : "bg-slate-900/40 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800/40 sm:bg-transparent sm:border-transparent"
               }`}
             >
-              Segurança & Isolamento de Dados
+              <span className="sm:hidden">Segurança</span>
+              <span className="hidden sm:inline">Segurança & Isolamento de Dados</span>
             </button>
             <button
               onClick={() => setActiveTab("regras")}
-              className={`pb-3 px-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap cursor-pointer ${
+              className={`p-3 sm:p-0 sm:pb-3 sm:px-3 rounded-xl sm:rounded-none text-xs sm:text-sm font-medium transition-all text-center sm:text-left cursor-pointer border sm:border-0 sm:border-b-2 whitespace-normal sm:whitespace-nowrap ${
                 activeTab === "regras"
-                  ? "border-purple-500 text-purple-400"
-                  : "border-transparent text-slate-400 hover:text-white"
+                  ? "bg-purple-500/20 border-purple-500/50 text-purple-300 font-semibold shadow-[0_0_15px_rgba(168,85,247,0.2)] sm:bg-transparent sm:shadow-none sm:border-purple-500 sm:text-purple-400"
+                  : "bg-slate-900/40 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800/40 sm:bg-transparent sm:border-transparent"
               }`}
             >
-              Motor de Preços & Regras de Quadras
+              <span className="sm:hidden">Regras de Preço</span>
+              <span className="hidden sm:inline">Motor de Preços & Regras de Quadras</span>
             </button>
           </div>
 
@@ -456,6 +467,18 @@ export default function ArenaSaasOverviewPage() {
               </ol>
             </div>
           )}
+        </div>
+
+        {/* Rodapé da Página do Projeto */}
+        <div className="pt-8 pb-14 sm:pb-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-400 text-center sm:text-left">
+          <Link
+            href="/#projetos"
+            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Voltar aos Projetos do Portfólio</span>
+          </Link>
+          <span>Desenvolvido com Django 4.2 LTS & Python</span>
         </div>
       </main>
     </div>
