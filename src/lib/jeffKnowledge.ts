@@ -22,6 +22,7 @@ export interface KnowledgeProject {
     pageUrl?: string;
     sandboxUrl?: string;
     githubUrl?: string;
+    liveUrl?: string;
     sectionId?: string;
   };
   sampleQuestions: string[];
@@ -134,40 +135,150 @@ export const KNOWLEDGE_PROJECTS: Record<string, KnowledgeProject> = {
       "Onde posso testar o sistema ao vivo?"
     ]
   },
-  devops: {
-    id: "devops",
-    name: "Cluster de Microsserviços & Chaos Simulator",
-    shortName: "Cluster DevOps",
-    category: "DevOps & Resiliência de Infraestrutura",
-    tagline: "Arquitetura distribuída em containers Docker com Nginx, Redis e auto-recuperação",
+  thalles: {
+    id: "thalles",
+    name: "Thalles Rayanderson • Arquitetura & Design",
+    shortName: "Site Thalles Rayanderson",
+    category: "Arquitetura, Luxo & Landing Page",
+    tagline: "Landing page institucional de alto padrão com galeria filtrável de projetos e captação de clientes",
     summary:
-      "Ambiente de microsserviços orquestrado via Docker Compose com proxy reverso Nginx, aplicação Python distribuída, cache Redis e políticas ativas de health-check e reinício automático.",
+      "Website exclusivo para arquiteto de alto padrão com estética visual de luxo, tipografia clássica (Cinzel) e moderna (Montserrat), catálogo filtrável de projetos residenciais e comerciais, processo criativo, depoimentos e canal de conversão via WhatsApp.",
     technicalDetails: {
       problemSolved:
-        "Garantir alta disponibilidade e tolerância a falhas em sistemas de missão crítica, com monitoramento contínuo de nós e recuperação autônoma de instâncias caídas.",
+        "Criar uma presença digital sofisticada e de alta autoridade para arquiteto de luxo, permitindo aos clientes explorar projetos anteriores por categoria e solicitar orçamentos personalizados com agilidade.",
       architecture:
-        "Orquestração declarativa com Docker Compose. Proxy reverso Nginx para balanceamento de carga, banco de dados isolado em rede interna bridge, cache Redis para sessões e health-checks a cada 10s com política restart: always.",
+        "Construído com HTML5 semântico, CSS3 avançado e JavaScript modular. Filtros dinâmicos no cliente para alternar projetos residenciais e comerciais instantaneamente sem recarregar a página, menu responsivo tátil e integração com a API do WhatsApp.",
       keyFeatures: [
-        "Balanceamento de carga round-robin via Nginx",
-        "Políticas de auto-recuperação de containers (Self-Healing em ~1.8s)",
-        "Isolamento estrito de rede interna (bridge segregada)",
-        "Simulador interativo de caos para derrubar nós e observar recuperação em tempo real"
+        "Identidade visual requintada de alto padrão (paleta dourada, sombras e tipografia Cinzel/Montserrat)",
+        "Filtros dinâmicos no portfólio (Todos, Residencial e Comercial)",
+        "Seções estratégicas de autoridade: Portfólio, Depoimentos, Processo Criativo e Sobre",
+        "Botão de alta conversão integrado com mensagem personalizada para o WhatsApp do arquiteto"
       ],
       metrics: [
-        "~1.8s de Tempo médio de auto-cura após crash de container",
-        "Zero exposição pública de portas de banco de dados",
-        "Builds multi-stage otimizadas para produção"
+        "100% Responsivo (Mobile, Tablet e Desktop)",
+        "Carregamento ultra-rápido com zero dependência de frameworks pesados",
+        "Alta taxa de conversão direta para WhatsApp"
       ],
-      stacks: ["Docker", "Docker Compose", "Nginx", "Redis", "Linux", "CI/CD GitHub Actions", "Python"]
+      stacks: ["JavaScript", "HTML5", "CSS3", "Design de Luxo", "Filtros de Portfólio", "WhatsApp API"]
     },
     navigation: {
-      githubUrl: "https://github.com/jeferson-taveira/infra-cluster",
+      liveUrl: "https://jefersontaveira.github.io/site-Thalles-Rayanderson/",
+      githubUrl: "https://github.com/jefersontaveira/site-Thalles-Rayanderson",
       sectionId: "projetos"
     },
     sampleQuestions: [
-      "Como você implementou o cluster Docker?",
-      "O que é o simulador de caos?",
-      "Como funciona a política de auto-cura?"
+      "Como foi desenvolvido o site do Thalles Rayanderson?",
+      "Quais tecnologias foram usadas no site de arquitetura?",
+      "Onde posso ver o site do Thalles funcionando?"
+    ]
+  },
+  rochel: {
+    id: "rochel",
+    name: "Rochell Furton • English Teacher",
+    shortName: "Site Rochell Furton",
+    category: "EdTech, Internacionalização & Landing Page",
+    tagline: "Plataforma internacional para professora de inglês com seletor multilíngue (EN/PT/ES) e Dark Mode",
+    summary:
+      "Landing page de alta conversão para professora de inglês internacional. Possui sistema de internacionalização (i18n) em 3 idiomas (Inglês, Português e Espanhol), alternador de tema Dark/Light Mode, animações de rolagem fluidas com AOS e agendamento de aulas com redirecionamento internacional.",
+    technicalDetails: {
+      problemSolved:
+        "Apresentar a metodologia de ensino e a experiência corporativa de uma professora internacional para alunos globais, permitindo a leitura no idioma de preferência e contratação ágil de aulas particulares.",
+      architecture:
+        "Desenvolvido com JavaScript modular para i18n dinâmico (troca de textos sem refresh), persistência de preferência de tema (Dark/Light Mode), animações com AOS e estilização com CSS moderno adaptado para todos os dispositivos.",
+      keyFeatures: [
+        "Seletor multilíngue em tempo real: Inglês (EN), Português (PT) e Espanhol (ES)",
+        "Alternador de Tema Claro e Escuro (Dark & Light Mode)",
+        "Animações dinâmicas de rolagem com AOS (Animate On Scroll)",
+        "Seções de Apresentação, Metodologia, Planos/Preços, Avaliações de Alunos e FAQ",
+        "Botão de agendamento de primeira aula com redirecionamento internacional para WhatsApp (+63 Filipinas)"
+      ],
+      metrics: [
+        "3 Idiomas com tradução instantânea",
+        "Suporte completo a Dark Mode",
+        "Alcance internacional de alunos"
+      ],
+      stacks: ["JavaScript ES6+", "i18n Multilíngue", "Dark / Light Mode", "AOS Animations", "CSS3 Flex/Grid", "Mobile First"]
+    },
+    navigation: {
+      liveUrl: "https://jefersontaveira.github.io/site-rochel/",
+      githubUrl: "https://github.com/jefersontaveira/site-rochel",
+      sectionId: "projetos"
+    },
+    sampleQuestions: [
+      "Como funciona a internacionalização no site da Rochell Furton?",
+      "Quais idiomas estão disponíveis no site de inglês?",
+      "Onde posso testar o site da Rochell?"
+    ]
+  },
+  acai: {
+    id: "acai",
+    name: "Só Se For Açaí • Pedidos Online & Cardápio Digital",
+    shortName: "Só Se For Açaí",
+    category: "E-Commerce, Delivery & Cardápio Digital",
+    tagline: "Web app de delivery interativo passo a passo com cálculo dinâmico de valores e checkout via WhatsApp",
+    summary:
+      "Aplicativo web interativo para delivery de açaí com experiência fluida estilo wizard. O cliente seleciona o tamanho do açaí, escolhe coberturas e adicionais especiais em tempo real, visualiza o subtotal atualizado instantaneamente e envia o pedido formatado com endereço direto para o WhatsApp da loja.",
+    technicalDetails: {
+      problemSolved:
+        "Substituir cardápios estáticos em PDF por uma experiência de compra interativa e guiada, reduzindo erros de pedidos e automatizando o cálculo de preços e complementos para o delivery.",
+      architecture:
+        "Single Page Application (SPA) em JavaScript puro. Fluxo em etapas (wizard): Etapa 1 (Tamanho do Copo) -> Etapa 2 (Cremes e Coberturas) -> Etapa 3 (Adicionais) -> Etapa 4 (Dados de Entrega & Envio para WhatsApp).",
+      keyFeatures: [
+        "Montagem guiada do açaí passo a passo com interface intuitiva",
+        "Totalizador dinâmico de preço calculado em tempo real a cada item adicionado",
+        "Geração de mensagem estruturada e higienizada pronta para envio no WhatsApp da loja",
+        "Feedbacks instantâneos de interação com alertas e toasts táteis"
+      ],
+      metrics: [
+        "Zero atrito na montagem de pedidos",
+        "Cálculo exato de valores sem divergências",
+        "100% Otimizado para smartphones (Mobile First)"
+      ],
+      stacks: ["JavaScript SPA", "Cardápio Digital", "Cálculo Dinâmico", "Checkout WhatsApp", "CSS3 Responsivo", "UX Passo a Passo"]
+    },
+    navigation: {
+      liveUrl: "https://jefersontaveira.github.io/acai/",
+      githubUrl: "https://github.com/jefersontaveira/acai",
+      sectionId: "projetos"
+    },
+    sampleQuestions: [
+      "Como funciona o sistema de pedidos do Só Se For Açaí?",
+      "O pedido é enviado diretamente para o WhatsApp?",
+      "Como foi construído o cálculo de preços em tempo real?"
+    ]
+  },
+  websites: {
+    id: "websites",
+    name: "Websites & Aplicações Web Comerciais",
+    shortName: "Websites & Landing Pages",
+    category: "Frontend, UX & Aplicações Comerciais",
+    tagline: "Projetos reais em produção: Arquitetura de Luxo, EdTech Multilíngue e Delivery Interativo",
+    summary:
+      "Coleção de projetos web desenvolvidos por Jeferson Taveira para clientes reais: Thalles Rayanderson (Arquitetura de Alto Padrão), Rochell Furton (Plataforma Multilíngue com Dark Mode) e Só Se For Açaí (Web App de Delivery com Checkout WhatsApp).",
+    technicalDetails: {
+      problemSolved:
+        "Criar interfaces de alto impacto visual, máxima conversão de vendas, responsividade absoluta e internacionalização com excelente velocidade de carregamento.",
+      architecture:
+        "Projetos com arquitetura mobile-first, layouts fluidos com CSS Grid/Flexbox, suporte a múltiplos idiomas (i18n), modos Claro/Escuro (Dark/Light mode) e integrações diretas de checkout via WhatsApp API.",
+      keyFeatures: [
+        "Thalles Rayanderson: estética de luxo, filtros dinâmicos de projetos residenciais/comerciais e captação de leads",
+        "Rochell Furton: seletor de 3 idiomas (EN/PT/ES), Dark Mode nativo, animações AOS e agendamento internacional de aulas",
+        "Só Se For Açaí: fluxo interativo wizard passo a passo, cálculo dinâmico de adicionais e checkout automático formatado para WhatsApp"
+      ],
+      metrics: [
+        "100% Responsivos em celulares, tablets e desktops",
+        "Zero dependência de backends pesados para landing pages de alta conversão",
+        "Integração instantânea com WhatsApp Business"
+      ],
+      stacks: ["JavaScript ES6+", "HTML5 Semântico", "CSS3 Avançado", "i18n Multilíngue", "AOS Animations", "WhatsApp API"]
+    },
+    navigation: {
+      sectionId: "projetos"
+    },
+    sampleQuestions: [
+      "Quais sites e landing pages o Jeferson desenvolveu?",
+      "Como funciona o sistema de delivery do Só Se For Açaí?",
+      "Como foi implementada a internacionalização no site da Rochell Furton?"
     ]
   }
 };

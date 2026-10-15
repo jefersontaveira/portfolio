@@ -1,7 +1,6 @@
 export type ProjectCategory = 
   | "ia-ml" 
   | "fullstack-python" 
-  | "devops-cloud" 
   | "frontend-mobile";
 
 export interface CodeSnippet {
@@ -26,9 +25,9 @@ export interface ProjectItem {
   githubUrl?: string;
   liveUrl?: string;
   featured: boolean;
-  accentColor: string; // ex: '#00F2FE', '#A855F7', '#10B981', '#FACC15'
+  accentColor: string; // ex: '#00F2FE', '#A855F7', '#F59E0B', '#38BDF8', '#EC4899'
   stats?: ProjectStat[];
-  interactiveType?: "onnx-vision" | "django-sandbox" | "devops-chaos" | "python-snippet" | "external";
+  interactiveType?: "onnx-vision" | "django-sandbox" | "external";
   pythonSnippets?: CodeSnippet[];
 }
 
@@ -36,8 +35,7 @@ export const CATEGORIES: { id: ProjectCategory | "all"; label: string }[] = [
   { id: "all", label: "Todos os Projetos" },
   { id: "ia-ml", label: "IA & Visão Computacional" },
   { id: "fullstack-python", label: "Python & Full Stack" },
-  { id: "devops-cloud", label: "DevOps & Containers" },
-  { id: "frontend-mobile", label: "Frontend & Mobile" },
+  { id: "frontend-mobile", label: "Websites & Landing Pages" },
 ];
 
 /**
@@ -173,41 +171,66 @@ def get_price_for_booking(cls, arena, court, start_datetime):
     ]
   },
   {
-    id: "devops-interactive-cluster",
-    title: "Cluster de Microsserviços & Chaos Simulator",
-    tagline: "Arquitetura resiliente com auto-recuperação, balanceamento Nginx e health-checks",
+    id: "site-thalles-rayanderson",
+    title: "Thalles Rayanderson • Arquitetura & Design",
+    tagline: "Landing page institucional de alto padrão com galeria filtrável de projetos e captação de clientes",
     description: 
-      "Orquestração de ambiente em containers Docker com proxy reverso Nginx, aplicação Python/Django distribuída, cache Redis e banco de dados relacional. Inclui monitoramento de integridade e políticas automáticas de reinício e isolamento de rede.",
-    category: "devops-cloud",
-    categoryLabel: "DevOps & Infra",
-    technologies: ["Docker", "Docker Compose", "Nginx", "Redis", "CI/CD GitHub Actions", "Linux"],
-    githubUrl: "https://github.com/jeferson-taveira/infra-cluster",
+      "Website exclusivo para arquiteto de alto padrão com estética visual de luxo, tipografia clássica e moderna, catálogo categorizado de projetos residenciais e comerciais, seção de processo criativo, depoimentos e canal direto de conversão para solicitação de orçamentos via WhatsApp.",
+    category: "frontend-mobile",
+    categoryLabel: "Arquitetura & Luxo",
+    technologies: ["JavaScript", "HTML5 Semântico", "CSS3 Avançado", "Filtros de Portfólio", "Design de Luxo", "WhatsApp API"],
+    githubUrl: "https://github.com/jefersontaveira/site-Thalles-Rayanderson",
+    liveUrl: "https://jefersontaveira.github.io/site-Thalles-Rayanderson/",
     featured: true,
-    accentColor: "#10B981",
-    interactiveType: "devops-chaos",
+    accentColor: "#F59E0B",
+    interactiveType: "external",
     stats: [
-      { label: "Tempo de Auto-Cura", value: "~1.8s" },
-      { label: "Isolamento de Rede", value: "Bridge Segregada" },
-      { label: "Builds", value: "Multi-Stage" },
-    ],
-    pythonSnippets: [
-      {
-        title: "docker-compose.yml (Health Check & Restart Policy)",
-        language: "yaml",
-        code: `services:
-  api:
-    build:
-      context: .
-      target: production
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    networks:
-      - internal-net`
-      }
+      { label: "Estilo Visual", value: "High-End / Luxo" },
+      { label: "Captação", value: "WhatsApp Direto" },
+      { label: "Projetos", value: "Residencial & Comercial" },
+      { label: "Experiência", value: "100% Responsivo" },
+    ]
+  },
+  {
+    id: "site-rochel-english",
+    title: "Rochell Furton • English Teacher",
+    tagline: "Plataforma internacional para professora de inglês com seletor multilíngue (EN/PT/ES) e Dark/Light Mode",
+    description: 
+      "Landing page de alta conversão para professora de inglês internacional. Possui sistema dinâmico de internacionalização (i18n) em 3 idiomas (Inglês, Português e Espanhol), alternância de tema Claro/Escuro, animações fluidas de rolagem com AOS e botão de reserva de primeira aula via WhatsApp internacional (+63 Filipinas).",
+    category: "frontend-mobile",
+    categoryLabel: "EdTech & Multilíngue",
+    technologies: ["JavaScript ES6+", "i18n (EN/PT/ES)", "Dark / Light Mode", "AOS Animations", "CSS3 Flex/Grid", "Mobile First"],
+    githubUrl: "https://github.com/jefersontaveira/site-rochel",
+    liveUrl: "https://jefersontaveira.github.io/site-rochel/",
+    featured: true,
+    accentColor: "#38BDF8",
+    interactiveType: "external",
+    stats: [
+      { label: "Internacionalização", value: "3 Idiomas (EN/PT/ES)" },
+      { label: "Temas", value: "Dark & Light Mode" },
+      { label: "Conversão", value: "Agendamento de Aulas" },
+      { label: "Animações", value: "AOS Library" },
+    ]
+  },
+  {
+    id: "site-acai-delivery",
+    title: "Só Se For Açaí • Pedidos Online & Cardápio Digital",
+    tagline: "Web app de delivery interativo passo a passo com cálculo dinâmico de valores e checkout via WhatsApp",
+    description: 
+      "Aplicativo web interativo para delivery de açaí com experiência fluida estilo wizard. O cliente seleciona o tamanho do açaí, escolhe coberturas e adicionais especiais em tempo real, visualiza o subtotal atualizado instantaneamente e envia o pedido formatado com endereço direto para o WhatsApp da loja.",
+    category: "frontend-mobile",
+    categoryLabel: "E-Commerce & Delivery",
+    technologies: ["JavaScript SPA", "Cardápio Digital", "Cálculo Dinâmico", "Checkout WhatsApp", "CSS3 Responsivo", "UX Passo a Passo"],
+    githubUrl: "https://github.com/jefersontaveira/acai",
+    liveUrl: "https://jefersontaveira.github.io/acai/",
+    featured: true,
+    accentColor: "#EC4899",
+    interactiveType: "external",
+    stats: [
+      { label: "Experiência", value: "Wizard em 3 Etapas" },
+      { label: "Totalizador", value: "Cálculo em Tempo Real" },
+      { label: "Checkout", value: "WhatsApp Automatizado" },
+      { label: "Público", value: "Mobile First" },
     ]
   }
 ];

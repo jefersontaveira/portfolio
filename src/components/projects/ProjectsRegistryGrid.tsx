@@ -182,13 +182,27 @@ export const ProjectsRegistryGrid: React.FC = () => {
                 </div>
 
                 {project.liveUrl ? (
-                  <Link
-                    href={project.liveUrl}
-                    className="text-xs font-mono font-medium text-[#00F2FE] hover:underline flex items-center gap-1 group/btn"
-                  >
-                    <span>Testar Demo & Detalhes</span>
-                    <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-                  </Link>
+                  project.liveUrl.startsWith("http") ? (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-mono font-medium hover:underline flex items-center gap-1 group/btn"
+                      style={{ color: project.accentColor }}
+                    >
+                      <span>Acessar Site Online</span>
+                      <ExternalLink className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                    </a>
+                  ) : (
+                    <Link
+                      href={project.liveUrl}
+                      className="text-xs font-mono font-medium hover:underline flex items-center gap-1 group/btn"
+                      style={{ color: project.accentColor }}
+                    >
+                      <span>Testar Demo & Detalhes</span>
+                      <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                    </Link>
+                  )
                 ) : project.githubUrl ? (
                   <a
                     href={project.githubUrl}
