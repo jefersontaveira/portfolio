@@ -3,10 +3,12 @@ import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 
-const DJANGO_URL =
+const DJANGO_URL = (
+  process.env.NEXT_PUBLIC_ARENA_BACKEND_URL ||
   process.env.NEXT_PUBLIC_DJANGO_API_URL ||
   process.env.DJANGO_API_URL ||
-  "http://127.0.0.1:8000";
+  "http://127.0.0.1:8000"
+).replace(/\/$/, "");
 
 let isSpawning = false;
 let lastSpawnTime = 0;
@@ -136,12 +138,12 @@ export async function POST(request: Request) {
         cache: "no-store",
       });
       const data = await res.json();
-      return NextResponse.json(data);
+      return NextResponse.json({ ...data, backendUrl: DJANGO_URL });
     }
-    return NextResponse.json({ status: "offline" }, { status: 503 });
+    return NextResponse.json({ status: "offline", backendUrl: DJANGO_URL }, { status: 503 });
   } catch (error: any) {
     return NextResponse.json(
-      { status: "offline", error: error.message },
+      { status: "offline", error: error.message, backendUrl: DJANGO_URL },
       { status: 500 }
     );
   }
@@ -158,12 +160,14 @@ export async function GET(request: Request) {
         return NextResponse.json({
           status: "online",
           message: "Servidor Django já está online.",
+          backendUrl: DJANGO_URL,
         });
       }
       const launch = launchLocalDjangoServer();
       return NextResponse.json({
         status: "starting",
         message: launch.message,
+        backendUrl: DJANGO_URL,
       });
     }
 
@@ -173,10 +177,10 @@ export async function GET(request: Request) {
         cache: "no-store",
       });
       const data = await res.json();
-      return NextResponse.json(data);
+      return NextResponse.json({ ...data, backendUrl: DJANGO_URL });
     }
-    return NextResponse.json({ status: "offline" });
+    return NextResponse.json({ status: "offline", backendUrl: DJANGO_URL });
   } catch {
-    return NextResponse.json({ status: "offline" });
+    return NextResponse.json({ status: "offline", backendUrl: DJANGO_URL });
   }
 }

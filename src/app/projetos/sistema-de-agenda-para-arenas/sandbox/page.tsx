@@ -20,7 +20,16 @@ export default function ArenaSandboxWindow() {
   const [isResetting, setIsResetting] = useState(false);
   const [resetFeedback, setResetFeedback] = useState<string | null>(null);
   const [timeExpired, setTimeExpired] = useState(false);
-  const [iframeUrl, setIframeUrl] = useState<string>("http://localhost:8000/accounts/login/");
+  const configuredBackend = (
+    process.env.NEXT_PUBLIC_ARENA_BACKEND_URL ||
+    process.env.NEXT_PUBLIC_DJANGO_API_URL ||
+    ""
+  ).replace(/\/$/, "");
+
+  const [activeBackendUrl, setActiveBackendUrl] = useState<string>(configuredBackend);
+  const [iframeUrl, setIframeUrl] = useState<string>(
+    configuredBackend ? `${configuredBackend}/accounts/login/` : "http://localhost:8000/accounts/login/"
+  );
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const [serverOnline, setServerOnline] = useState<boolean | null>(null);
@@ -28,6 +37,10 @@ export default function ArenaSandboxWindow() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const getBackendUrl = (path: string = "/accounts/login/") => {
+    const base = activeBackendUrl || configuredBackend;
+    if (base) {
+      return `${base}${path}`;
+    }
     if (typeof window !== "undefined") {
       const host = window.location.hostname || "localhost";
       return `http://${host}:8000${path}`;
@@ -39,7 +52,7 @@ export default function ArenaSandboxWindow() {
     if (typeof window !== "undefined") {
       setIframeUrl(getBackendUrl("/accounts/login/"));
     }
-  }, []);
+  }, [activeBackendUrl]);
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -55,11 +68,17 @@ export default function ArenaSandboxWindow() {
       const url = wake ? "/api/arena-demo?action=wake" : "/api/arena-demo";
       const res = await fetch(url, { cache: "no-store" });
       const data = await res.json();
+      if (data.backendUrl) {
+        setActiveBackendUrl(data.backendUrl.replace(/\/$/, ""));
+      }
       if (data.status === "online") {
         setServerOnline(true);
         setServerState("online");
-        if (iframeRef.current && (!iframeRef.current.src || iframeRef.current.src === "about:blank")) {
-          iframeRef.current.src = getBackendUrl("/accounts/login/");
+        const resolvedBase = data.backendUrl ? data.backendUrl.replace(/\/$/, "") : (activeBackendUrl || configuredBackend);
+        const resolvedUrl = `${resolvedBase || getBackendUrl()}/accounts/login/`;
+        setIframeUrl(resolvedUrl);
+        if (iframeRef.current && (!iframeRef.current.src || iframeRef.current.src === "about:blank" || (iframeRef.current.src.includes("localhost:8000") && resolvedBase && !resolvedBase.includes("localhost")))) {
+          iframeRef.current.src = resolvedUrl;
         }
       } else if (data.status === "starting") {
         setServerOnline(false);
@@ -192,7 +211,7 @@ export default function ArenaSandboxWindow() {
                         serverOnline ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
                       }`}
                     />
-                    {serverOnline ? "Online (8000)" : "Offline"}
+                    {serverOnline ? (activeBackendUrl && !activeBackendUrl.includes("localhost") ? "Online (Nuvem)" : "Online (8000)") : "Offline"}
                   </span>
                 </>
               )}
@@ -346,7 +365,7 @@ export default function ArenaSandboxWindow() {
                 </p>
                 <div className="flex items-center gap-2 text-xs font-mono text-purple-300 px-4 py-2 rounded-lg bg-purple-950/40 border border-purple-500/20">
                   <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
-                  <span>Sincronizando com backend (Porta 8000)...</span>
+                  <span>Sincronizando com backend ({activeBackendUrl && !activeBackendUrl.includes("localhost") ? "Nuvem" : "Porta 8000"})...</span>
                 </div>
               </>
             ) : (
@@ -356,8 +375,13 @@ export default function ArenaSandboxWindow() {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Servidor Django em Standby</h3>
                 <p className="text-sm text-slate-300 max-w-md mb-6 leading-relaxed">
-                  O sandbox interativo se conecta ao backend Django em <code className="text-purple-300 font-mono px-1.5 py-0.5 rounded bg-purple-950/60 border border-purple-500/20">http://127.0.0.1:8000</code>.
-                  Você pode iniciá-lo agora com um clique em segundo plano:
+                  O sandbox interativo se conecta ao backend Django em{" "}
+                  <code className="text-purple-300 font-mono px-1.5 py-0.5 rounded bg-purple-950/60 border border-purple-500/20">
+                    {activeBackendUrl || configuredBackend || "http://127.0.0.1:8000"}
+                  </code>.
+                  {(!activeBackendUrl || activeBackendUrl.includes("localhost")) && (
+                    <> Você pode iniciá-lo agora com um clique em segundo plano:</>
+                  )}
                 </p>
                 <div className="flex flex-col sm:flex-row items-center gap-3">
                   <button

@@ -100,7 +100,7 @@ export default function ArenaSaasOverviewPage() {
             {serverState === "online" && (
               <span className="text-[11px] sm:text-xs px-2.5 py-1 rounded-md font-mono flex items-center gap-1.5 whitespace-nowrap bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="hidden sm:inline">Backend Ativo (Porta 8000)</span>
+                <span className="hidden sm:inline">Backend Ativo</span>
                 <span className="sm:hidden">Online</span>
               </span>
             )}
