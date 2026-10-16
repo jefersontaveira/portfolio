@@ -12,7 +12,9 @@ import {
   ArrowUpRight,
   ShieldCheck,
   Clock,
-  MessageSquare
+  MessageSquare,
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { DEVELOPER_PROFILE } from "@/lib/careerContext";
 
@@ -47,6 +49,10 @@ export const ContactSection: React.FC = () => {
   const [copiedAll, setCopiedAll] = useState(false);
   const [quickMessage, setQuickMessage] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("Oportunidade / Projeto");
+  const [senderContact, setSenderContact] = useState("");
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<"idle" | "success" | "error">("idle");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
 
   const emailAddress = "jefersontave@gmail.com";
   const rawWhatsApp = "85981311975";
@@ -77,17 +83,55 @@ export const ContactSection: React.FC = () => {
     setTimeout(() => setCopiedAll(false), 2200);
   };
 
-
-
   const buildWhatsAppMessageUrl = () => {
-    const baseText = `Olá Jeferson! Vi seu portfólio. Assunto: [${selectedTopic}]. ${quickMessage ? `Mensagem: ${quickMessage}` : "Gostaria de agendar uma conversa."}`;
+    const contactInfo = senderContact.trim() ? ` (Meu contato: ${senderContact.trim()})` : "";
+    const baseText = `Olá Jeferson! Vi seu portfólio. Assunto: [${selectedTopic}]. ${
+      quickMessage ? `Mensagem: ${quickMessage}` : "Gostaria de agendar uma conversa."
+    }${contactInfo}`;
     return `${whatsappUrl}?text=${encodeURIComponent(baseText)}`;
   };
 
-  const buildEmailMessageUrl = () => {
-    const subject = `[Portfólio] Contato: ${selectedTopic}`;
-    const body = `Olá Jeferson,\n\n${quickMessage ? quickMessage : "Gostaria de falar com você sobre novas oportunidades e projetos de engenharia de software."}\n\nAtenciosamente,`;
-    return `mailto:${emailAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const handleSendDirectEmail = async () => {
+    if (!senderContact.trim()) {
+      setEmailStatus("error");
+      setFeedbackMessage("Informe seu e-mail ou WhatsApp para que eu possa te responder.");
+      return;
+    }
+
+    setIsSendingEmail(true);
+    setEmailStatus("idle");
+    setFeedbackMessage("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic: selectedTopic,
+          senderContact: senderContact.trim(),
+          message: quickMessage.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erro ao enviar mensagem.");
+      }
+
+      setEmailStatus("success");
+      setFeedbackMessage("E-mail enviado diretamente! Retornarei o mais breve possível.");
+      setQuickMessage("");
+      setTimeout(() => {
+        setEmailStatus("idle");
+        setFeedbackMessage("");
+      }, 7000);
+    } catch (err: any) {
+      setEmailStatus("error");
+      setFeedbackMessage(err.message || "Erro no envio. Tente via WhatsApp ou copie nosso e-mail.");
+    } finally {
+      setIsSendingEmail(false);
+    }
   };
 
   const channels: ContactChannel[] = [
@@ -314,6 +358,22 @@ export const ContactSection: React.FC = () => {
                 </div>
 
                 <div>
+                  <input
+                    type="text"
+                    value={senderContact}
+                    onChange={(e) => {
+                      setSenderContact(e.target.value);
+                      if (emailStatus !== "idle") {
+                        setEmailStatus("idle");
+                        setFeedbackMessage("");
+                      }
+                    }}
+                    placeholder="Seu e-mail ou WhatsApp para retorno..."
+                    className="w-full text-xs font-mono bg-[#080B11] border border-white/10 rounded-xl px-3 py-2 text-gray-200 placeholder:text-gray-500 focus:outline-none focus:border-[#00F2FE] transition-colors"
+                  />
+                </div>
+
+                <div>
                   <textarea
                     rows={2}
                     value={quickMessage}
@@ -322,6 +382,23 @@ export const ContactSection: React.FC = () => {
                     className="w-full text-xs font-mono bg-[#080B11] border border-white/10 rounded-xl p-2.5 text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-[#00F2FE] transition-colors resize-none"
                   />
                 </div>
+
+                {feedbackMessage && (
+                  <div
+                    className={`text-[11px] font-mono p-2.5 rounded-xl flex items-start gap-2 transition-all ${
+                      emailStatus === "success"
+                        ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                        : "bg-rose-500/10 border border-rose-500/30 text-rose-300"
+                    }`}
+                  >
+                    {emailStatus === "success" ? (
+                      <Check className="w-3.5 h-3.5 shrink-0 mt-0.5 text-emerald-400" />
+                    ) : (
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-rose-400" />
+                    )}
+                    <span className="leading-tight">{feedbackMessage}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -330,19 +407,35 @@ export const ContactSection: React.FC = () => {
                 href={buildWhatsAppMessageUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2 px-2 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all text-center"
+                className="py-2.5 px-2 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all text-center"
               >
                 <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
                 <span>WhatsApp</span>
               </a>
 
-              <a
-                href={buildEmailMessageUrl()}
-                className="py-2 px-2 rounded-xl bg-[#00F2FE]/15 hover:bg-[#00F2FE]/25 border border-[#00F2FE]/40 text-[#00F2FE] text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all text-center"
+              <button
+                type="button"
+                onClick={handleSendDirectEmail}
+                disabled={isSendingEmail}
+                className="py-2.5 px-2 rounded-xl bg-[#00F2FE]/15 hover:bg-[#00F2FE]/25 disabled:opacity-60 border border-[#00F2FE]/40 text-[#00F2FE] text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all text-center cursor-pointer disabled:cursor-not-allowed"
               >
-                <Send className="w-3.5 h-3.5 shrink-0" />
-                <span>E-mail</span>
-              </a>
+                {isSendingEmail ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+                    <span>Enviando...</span>
+                  </>
+                ) : emailStatus === "success" ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="text-emerald-400">Enviado!</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5 shrink-0" />
+                    <span>E-mail</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
