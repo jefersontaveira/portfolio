@@ -26,22 +26,40 @@ import {
 } from "lucide-react";
 
 export default function ArenaSaasOverviewPage() {
-  const [serverOnline, setServerOnline] = useState<boolean | null>(null);
+  const [serverState, setServerState] = useState<"online" | "starting" | "offline" | "checking">("checking");
+  const [wakeFeedback, setWakeFeedback] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"visao-geral" | "arquitetura" | "seguranca" | "regras">("visao-geral");
 
+  const checkOrWakeServer = async (wake: boolean = true) => {
+    try {
+      const url = wake ? "/api/arena-demo?action=wake" : "/api/arena-demo";
+      const res = await fetch(url, { cache: "no-store" });
+      const data = await res.json();
+      if (data.status === "online") {
+        setServerState("online");
+        setWakeFeedback(null);
+      } else if (data.status === "starting") {
+        setServerState("starting");
+        setWakeFeedback(data.message || "Inicializando backend em segundo plano...");
+        setTimeout(() => checkOrWakeServer(false), 2500);
+      } else {
+        setServerState("offline");
+      }
+    } catch {
+      setServerState("offline");
+    }
+  };
+
   useEffect(() => {
-    // Checa status do servidor local Django
-    fetch("/api/arena-demo")
-      .then((res) => res.json())
-      .then((data) => {
-        setServerOnline(data.status === "online");
-      })
-      .catch(() => {
-        setServerOnline(false);
-      });
+    // Ao acessar a página, dispara o comando para acordar/ligar o backend em segundo plano
+    checkOrWakeServer(true);
   }, []);
 
   const openSandboxWindow = () => {
+    // Se o backend estiver em standby, acorda-o em segundo plano antes de abrir
+    if (serverState !== "online") {
+      checkOrWakeServer(true);
+    }
     // Abre a janela de sandbox interativa com o contador de 20 min
     window.open(
       "/projetos/sistema-de-agenda-para-arenas/sandbox",
@@ -78,25 +96,37 @@ export default function ArenaSaasOverviewPage() {
               <span>Django 4.2</span>
             </div>
 
-            {serverOnline !== null && (
-              <span
-                className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-md font-mono flex items-center gap-1.5 whitespace-nowrap ${
-                  serverOnline
-                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                    : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                }`}
+            {/* Badge de Status Interativo do Backend */}
+            {serverState === "online" && (
+              <span className="text-[11px] sm:text-xs px-2.5 py-1 rounded-md font-mono flex items-center gap-1.5 whitespace-nowrap bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="hidden sm:inline">Backend Ativo (Porta 8000)</span>
+                <span className="sm:hidden">Online</span>
+              </span>
+            )}
+
+            {serverState === "starting" && (
+              <span className="text-[11px] sm:text-xs px-2.5 py-1 rounded-md font-mono flex items-center gap-1.5 whitespace-nowrap bg-purple-500/15 text-purple-300 border border-purple-500/30 animate-pulse">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-ping" />
+                <span className="hidden sm:inline">Iniciando em 2º plano...</span>
+                <span className="sm:hidden">Iniciando...</span>
+              </span>
+            )}
+
+            {serverState === "offline" && (
+              <button
+                onClick={() => checkOrWakeServer(true)}
+                title="Clique para ligar o servidor backend em segundo plano"
+                className="text-[11px] sm:text-xs px-2.5 py-1 rounded-md font-mono flex items-center gap-1.5 whitespace-nowrap bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-colors cursor-pointer"
               >
-                <span
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    serverOnline ? "bg-emerald-400" : "bg-amber-400"
-                  }`}
-                />
-                <span className="hidden sm:inline">
-                  {serverOnline ? "Sandbox Online (Porta 8000)" : "Servidor Local Standby"}
-                </span>
-                <span className="sm:hidden">
-                  {serverOnline ? "Sandbox Online" : "Standby"}
-                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                <span>Ligar Backend</span>
+              </button>
+            )}
+
+            {serverState === "checking" && (
+              <span className="text-[11px] sm:text-xs px-2.5 py-1 rounded-md font-mono text-slate-400 bg-white/5 border border-white/10">
+                Checando...
               </span>
             )}
           </div>

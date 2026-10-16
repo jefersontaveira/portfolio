@@ -47,26 +47,40 @@ export default function ArenaSandboxWindow() {
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const checkServerStatus = async () => {
+  const [serverState, setServerState] = useState<"online" | "starting" | "offline" | "checking">("checking");
+
+  const wakeOrCheckServer = async (wake: boolean = false) => {
     setCheckingServer(true);
     try {
-      const res = await fetch("/api/arena-demo", { cache: "no-store" });
+      const url = wake ? "/api/arena-demo?action=wake" : "/api/arena-demo";
+      const res = await fetch(url, { cache: "no-store" });
       const data = await res.json();
-      const online = data.status === "online";
-      setServerOnline(online);
-      if (online && iframeRef.current && !iframeRef.current.src) {
-        iframeRef.current.src = getBackendUrl("/accounts/login/");
+      if (data.status === "online") {
+        setServerOnline(true);
+        setServerState("online");
+        if (iframeRef.current && (!iframeRef.current.src || iframeRef.current.src === "about:blank")) {
+          iframeRef.current.src = getBackendUrl("/accounts/login/");
+        }
+      } else if (data.status === "starting") {
+        setServerOnline(false);
+        setServerState("starting");
+        setTimeout(() => wakeOrCheckServer(false), 2500);
+      } else {
+        setServerOnline(false);
+        setServerState("offline");
       }
     } catch {
       setServerOnline(false);
+      setServerState("offline");
     } finally {
       setCheckingServer(false);
     }
   };
 
   useEffect(() => {
-    checkServerStatus();
-    const serverInterval = setInterval(checkServerStatus, 15000);
+    // Ao abrir o sandbox, acorda automaticamente o backend em segundo plano!
+    wakeOrCheckServer(true);
+    const serverInterval = setInterval(() => wakeOrCheckServer(false), 12000);
     return () => clearInterval(serverInterval);
   }, []);
 
@@ -318,28 +332,53 @@ export default function ArenaSandboxWindow() {
           title="Demonstração do Sistema de Arenas"
         />
 
-        {/* OVERLAY CASO O SERVIDOR LOCAL ESTEJA OFFLINE */}
+        {/* OVERLAY CASO O SERVIDOR LOCAL ESTEJA OFFLINE OU INICIALIZANDO */}
         {serverOnline === false && (
           <div className="absolute inset-0 bg-[#070913]/95 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center animate-fadeIn">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mb-4">
-              <AlertTriangle className="w-8 h-8" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Servidor Django Desconectado</h3>
-            <p className="text-sm text-slate-300 max-w-md mb-6 leading-relaxed">
-              O sandbox interativo se conecta ao backend Django em <code className="text-purple-300 font-mono px-1.5 py-0.5 rounded bg-purple-950/60 border border-purple-500/20">http://127.0.0.1:8000</code>.
-              Inicie o servidor para liberar o acesso:
-            </p>
-            <div className="px-4 py-3 rounded-xl bg-slate-900 border border-white/10 font-mono text-xs text-purple-300 mb-6 flex items-center gap-3 shadow-inner">
-              <span>python manage.py runserver 127.0.0.1:8000</span>
-            </div>
-            <button
-              onClick={checkServerStatus}
-              disabled={checkingServer}
-              className="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs flex items-center gap-2 transition-colors cursor-pointer shadow-lg shadow-purple-900/30 disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 ${checkingServer ? "animate-spin" : ""}`} />
-              <span>{checkingServer ? "Verificando Conexão..." : "Tentar Reconectar Agora"}</span>
-            </button>
+            {serverState === "starting" ? (
+              <>
+                <div className="w-16 h-16 rounded-2xl bg-purple-500/20 border border-purple-500/40 text-purple-300 flex items-center justify-center mb-4 animate-pulse">
+                  <RefreshCw className="w-8 h-8 animate-spin text-purple-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Inicializando Backend em Segundo Plano</h3>
+                <p className="text-sm text-slate-300 max-w-md mb-6 leading-relaxed">
+                  O servidor Django foi acionado em segundo plano. Aguarde alguns instantes enquanto o ambiente carrega; a conexão será estabelecida automaticamente.
+                </p>
+                <div className="flex items-center gap-2 text-xs font-mono text-purple-300 px-4 py-2 rounded-lg bg-purple-950/40 border border-purple-500/20">
+                  <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
+                  <span>Sincronizando com backend (Porta 8000)...</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mb-4">
+                  <AlertTriangle className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Servidor Django em Standby</h3>
+                <p className="text-sm text-slate-300 max-w-md mb-6 leading-relaxed">
+                  O sandbox interativo se conecta ao backend Django em <code className="text-purple-300 font-mono px-1.5 py-0.5 rounded bg-purple-950/60 border border-purple-500/20">http://127.0.0.1:8000</code>.
+                  Você pode iniciá-lo agora com um clique em segundo plano:
+                </p>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <button
+                    onClick={() => wakeOrCheckServer(true)}
+                    disabled={checkingServer}
+                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-purple-900/30 disabled:opacity-50"
+                  >
+                    <Sparkles className="w-4 h-4 text-purple-200" />
+                    <span>Ligar Backend em Segundo Plano</span>
+                  </button>
+                  <button
+                    onClick={() => wakeOrCheckServer(false)}
+                    disabled={checkingServer}
+                    className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-medium text-xs flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${checkingServer ? "animate-spin" : ""}`} />
+                    <span>Verificar Status</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 

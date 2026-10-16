@@ -37,6 +37,10 @@ export const ProjectsRegistryGrid: React.FC = () => {
     return matchesCategory && matchesSearch;
   });
 
+  const triggerBackendPrewarm = () => {
+    fetch("/api/arena-demo?action=wake").catch(() => {});
+  };
+
   return (
     <section id="projetos" className="my-16 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -94,6 +98,7 @@ export const ProjectsRegistryGrid: React.FC = () => {
           {filteredProjects.map((project) => (
             <div
               key={project.id}
+              onMouseEnter={project.id === "saas-arenas" ? triggerBackendPrewarm : undefined}
               className="group relative rounded-2xl bg-[#0F172A]/60 border border-white/10 hover:border-[#00F2FE]/40 p-6 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-xl backdrop-blur-sm"
             >
               <div>
@@ -196,6 +201,7 @@ export const ProjectsRegistryGrid: React.FC = () => {
                   ) : (
                     <Link
                       href={project.liveUrl}
+                      onClick={project.id === "saas-arenas" ? triggerBackendPrewarm : undefined}
                       className="text-xs font-mono font-medium hover:underline flex items-center gap-1 group/btn"
                       style={{ color: project.accentColor }}
                     >
