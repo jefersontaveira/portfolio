@@ -5,11 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:resume": "node scripts/generate_resume.js",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@google/genai": "^2.28.0",
+    "@types/qrcode": "^1.5.6",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "framer-motion": "^12.4.7",
@@ -17,6 +19,7 @@
     "next": "^15.2.1",
     "onnxruntime-node": "^1.30.0",
     "onnxruntime-web": "^1.21.0",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "resend": "^6.33.0",
