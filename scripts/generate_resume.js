@@ -20,7 +20,7 @@ async function generateResume() {
   console.log('✅ Foto de perfil carregada e codificada em Base64.');
 
   // 2. Gerar QR Codes estilizados em alta resolução (DataURL)
-  const portfolioUrl = 'https://github.com/jefersontaveira';
+  const portfolioUrl = 'https://jefersontave.vercel.app/';
   const whatsappUrl = 'https://wa.me/5585981311975?text=Ol%C3%A1%20Jeferson!%20Vi%20seu%20curr%C3%ADculo%20e%20gostaria%20de%20conversar.';
   
   const qrPortfolioBase64 = await QRCode.toDataURL(portfolioUrl, {
@@ -623,13 +623,17 @@ async function generateResume() {
           <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
           <a href="https://github.com/jefersontaveira">github.com/jefersontaveira</a>
         </li>
+        <li class="contact-item">
+          <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <a href="https://jefersontave.vercel.app/">jefersontave.vercel.app</a>
+        </li>
       </ul>
 
       <!-- QR CODE 1: PORTFÓLIO & REPOSITÓRIOS -->
       <div class="qr-card">
         <img src="${qrPortfolioBase64}" alt="QR Code Portfólio" class="qr-image">
         <div class="qr-label">Portfólio & Demos Online</div>
-        <div class="qr-sub">Aponte a câmera do celular</div>
+        <div class="qr-sub">jefersontave.vercel.app</div>
       </div>
 
       <!-- COMPETÊNCIAS TÉCNICAS (HARD SKILLS) -->
@@ -640,7 +644,6 @@ async function generateResume() {
         <div class="pills-container">
           <span class="tech-pill highlight">PyTorch</span>
           <span class="tech-pill highlight">ONNX Runtime</span>
-          <span class="tech-pill">WebAssembly</span>
           <span class="tech-pill">CNNs</span>
           <span class="tech-pill">Computer Vision</span>
           <span class="tech-pill">Quantização</span>
@@ -676,16 +679,17 @@ async function generateResume() {
 
       <!-- IDIOMAS -->
       <div class="sidebar-title" style="margin-top: 2mm;">Idiomas & Comunicação</div>
-      <div class="pills-container" style="margin-bottom: 4mm;">
+      <div class="pills-container" style="margin-bottom: 3.5mm;">
         <span class="tech-pill highlight">Português (Nativo)</span>
-        <span class="tech-pill">Inglês (Técnico / Leitura Avançada)</span>
+        <span class="tech-pill highlight">Espanhol (Fluente)</span>
+        <span class="tech-pill">Inglês (Técnico / Avançado)</span>
       </div>
 
       <!-- DIFERENCIAIS DE ATUAÇÃO -->
       <div class="sidebar-title" style="margin-top: 1mm;">Diferenciais de Atuação</div>
       <div style="font-size: 6.8pt; color: #94A3B8; line-height: 1.45;">
-        <div style="margin-bottom: 1.5mm;"><strong style="color: #00F2FE;">&bull; Entrega Ponta a Ponta:</strong> Da concepção e treinamento do modelo de IA até o deploy de microsserviços em produção.</div>
-        <div style="margin-bottom: 1.5mm;"><strong style="color: #A855F7;">&bull; Autonomia & Pragmatismo:</strong> Foco absoluto na resolução de problemas reais de negócio e satisfação do usuário.</div>
+        <div style="margin-bottom: 1.5mm;"><strong style="color: #00F2FE;">&bull; Entrega Ponta a Ponta:</strong> Do treinamento e otimização do modelo ao deploy de microsserviços.</div>
+        <div style="margin-bottom: 1.5mm;"><strong style="color: #A855F7;">&bull; Autonomia & Foco em Negócio:</strong> Foco absoluto na resolução de problemas reais e satisfação do usuário.</div>
         <div><strong style="color: #10B981;">&bull; Cultura de Qualidade:</strong> Código desacoplado, tipagem estrita e documentação clara.</div>
       </div>
     </aside>
@@ -711,7 +715,7 @@ async function generateResume() {
           <span>Perfil & Síntese Executiva</span>
         </div>
         <p class="summary-text">
-          Engenheiro de Software com foco em soluções de alto impacto: do treinamento e otimização de redes neurais convolucionais (PyTorch compilado para ONNX com inferência no navegador via WebAssembly) à engenharia de microsserviços distribuídos em Python (Django 4.2 LTS, FastAPI, transações atômicas anti-concorrência) e interfaces web reativas de alta conversão (Next.js 15, TypeScript).
+          Engenheiro de Software com foco em soluções de alto impacto: do treinamento e otimização de modelos de Machine Learning (PyTorch e ONNX no navegador) à arquitetura de microsserviços em Python (Django 4.2 LTS, FastAPI, concorrência transacional) e interfaces reativas modernas com Next.js 15 e TypeScript.
         </p>
       </section>
 
@@ -728,7 +732,7 @@ async function generateResume() {
           </div>
           <div class="metric-card sky">
             <span class="metric-val">&lt; 15ms</span>
-            <span class="metric-desc">Latência de inferência WebAssembly cliente</span>
+            <span class="metric-desc">Latência de inferência no navegador (Client)</span>
           </div>
           <div class="metric-card emerald">
             <span class="metric-val">100%</span>
@@ -754,27 +758,26 @@ async function generateResume() {
             <div class="project-title">
               <span>Laboratório de Visão Computacional (QuickDraw CNN)</span>
             </div>
-            <span class="ptag" style="color: #00F2FE; border-color: rgba(0,242,254,0.3);">PyTorch &bull; ONNX WebAssembly</span>
+            <span class="ptag" style="color: #00F2FE; border-color: rgba(0,242,254,0.3);">PyTorch &bull; ONNX Web</span>
           </div>
           <div class="project-tagline">Inferência neural de alta performance rodando 100% no cliente sem custo de servidor</div>
           <p class="project-desc">
-            Desenvolvimento de pipeline completo de Deep Learning: concepção de arquitetura CNN personalizada em PyTorch (2 blocos Conv2D, Dropout e Softmax), treinamento supervisionado com o dataset do Google QuickDraw e exportação estática otimizada para o padrão aberto ONNX.
+            Pipeline completo de Deep Learning: concepção de rede CNN em PyTorch (2 blocos Conv2D, Dropout e Softmax), treinada com o dataset QuickDraw e exportada para ONNX.
           </p>
           <ul class="project-bullets">
             <li class="project-bullet">
               <span class="bullet-arrow">&rsaquo;</span>
-              <span><strong>Execução Client-Side:</strong> Executado no navegador com <code>onnxruntime-web</code> via WebAssembly multithread, eliminando 100% dos custos com instâncias GPU na nuvem e garantindo privacidade total.</span>
+              <span><strong>Execução Client-Side:</strong> Execução no navegador via <code>onnxruntime-web</code>, eliminando custos de GPU na nuvem e garantindo privacidade total.</span>
             </li>
             <li class="project-bullet">
               <span class="bullet-arrow">&rsaquo;</span>
-              <span><strong>Ultra Baixa Latência:</strong> Reconhecimento de 8 categorias de desenhos em tempo real com pré-processamento de imagem automático e latência média inferior a 15ms.</span>
+              <span><strong>Ultra Baixa Latência:</strong> Reconhecimento de 8 classes de desenhos em tempo real com pré-processamento automático e predição em menos de 15ms (94.2% de acurácia).</span>
             </li>
           </ul>
           <div class="project-tags">
             <span class="ptag">Python</span>
             <span class="ptag">PyTorch</span>
             <span class="ptag">ONNX Runtime</span>
-            <span class="ptag">WebAssembly</span>
             <span class="ptag">TypeScript</span>
             <span class="ptag">Canvas API</span>
           </div>
@@ -790,20 +793,20 @@ async function generateResume() {
           </div>
           <div class="project-tagline">Plataforma escalável com motor de preços em cascata, escolinhas e checkout Pix</div>
           <p class="project-desc">
-            Ecossistema robusto para centros esportivos (Beach Tennis, Padel, Futsal) com isolamento rigoroso de tenants por schema/banco, portal público personalizável do atleta e conciliação bancária automatizada.
+            Ecossistema para centros esportivos (Beach Tennis, Padel, Futsal) com isolamento multi-tenant por arena, portal público do atleta e conciliação bancária automatizada.
           </p>
           <ul class="project-bullets">
             <li class="project-bullet">
               <span class="bullet-arrow">&rsaquo;</span>
-              <span><strong>Controle de Concorrência & ACID:</strong> Implementação de locks pessimistas em nível de banco de dados e transações atômicas para blindar o sistema contra overbooking e race conditions em reservas simultâneas.</span>
+              <span><strong>Concorrência & ACID:</strong> Locks pessimistas no banco de dados e transações atômicas para blindar contra overbooking e race conditions em reservas simultâneas.</span>
             </li>
             <li class="project-bullet">
               <span class="bullet-arrow">&rsaquo;</span>
-              <span><strong>Motor de Precificação Dinâmico:</strong> Algoritmo de resolução de tarifas em cascata (Horário Nobre &gt; Dia da Semana &gt; Quadra &gt; Tarifa Padrão da Arena).</span>
+              <span><strong>Motor de Tarifação Dinâmico:</strong> Algoritmo de resolução de preços em cascata (Horário Nobre &gt; Dia da Semana &gt; Quadra &gt; Tarifa Padrão).</span>
             </li>
             <li class="project-bullet">
               <span class="bullet-arrow">&rsaquo;</span>
-              <span><strong>Integração FinTech:</strong> Cobranças Pix instantâneas via API/Webhooks do Asaas com expiração automática de pedidos em 15 minutos e split de recebíveis.</span>
+              <span><strong>Integração FinTech:</strong> Cobranças Pix instantâneas via API/Webhooks do Asaas com expiração automática em 15 minutos e split financeiro.</span>
             </li>
           </ul>
           <div class="project-tags">
@@ -869,21 +872,21 @@ async function generateResume() {
           <span class="tech-pill highlight">Docker Compose</span>
           <span class="tech-pill">PyTest</span>
           <span class="tech-pill">Vercel & Render</span>
-          <span class="tech-pill">Figma to Code</span>
         </div>
       </div>
 
       <!-- FORMAÇÃO & EDUCAÇÃO CONTÍNUA -->
-      <div class="sidebar-title" style="margin-top: 1mm;">Formação Contínua</div>
+      <div class="sidebar-title" style="margin-top: 1mm;">Formação & Especialização</div>
       <div style="font-size: 7pt; color: #CBD5E1; line-height: 1.4; margin-bottom: 3mm;">
-        <strong style="color: #FFFFFF; display: block; margin-bottom: 0.5mm;">Engenharia de Software & IA</strong>
-        <span>Prática intensiva orientada a projetos reais em produção, documentações oficiais, papers de Deep Learning e arquiteturas escaláveis.</span>
+        <strong style="color: #00F2FE; display: block; margin-bottom: 0.5mm;">Pós em Machine Learning</strong>
+        <span>Especialização em Inteligência Artificial, redes neurais profundas, visão computacional e otimização de modelos.</span>
       </div>
 
       <!-- ESPECIALIZAÇÕES & PESQUISA -->
       <div class="sidebar-title" style="margin-top: 1mm;">Áreas de Especialização</div>
       <div class="pills-container" style="margin-bottom: 3mm;">
-        <span class="tech-pill highlight">Edge Computing</span>
+        <span class="tech-pill highlight">Pós em Machine Learning</span>
+        <span class="tech-pill highlight">Computer Vision</span>
         <span class="tech-pill violet-pill">Microsserviços</span>
         <span class="tech-pill">ONNX & PyTorch</span>
         <span class="tech-pill">FinTech Integrations</span>
@@ -894,7 +897,11 @@ async function generateResume() {
       <div class="sidebar-title" style="margin-top: 1mm;">Canais & Repositórios</div>
       <ul class="contact-list" style="font-size: 7pt;">
         <li class="contact-item">
-          <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <a href="https://jefersontave.vercel.app/">jefersontave.vercel.app</a>
+        </li>
+        <li class="contact-item">
+          <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
           <a href="https://github.com/jefersontaveira">github.com/jefersontaveira</a>
         </li>
         <li class="contact-item">
@@ -923,7 +930,7 @@ async function generateResume() {
           </div>
           <div class="project-tagline">Presença digital sofisticada com galeria categorizada e captação direta de clientes</div>
           <p class="project-desc">
-            Website exclusivo desenvolvido para arquiteto de alto padrão. Layout elegante com paleta nobre, catálogo dinâmico de projetos residenciais e comerciais com filtros em tempo real, canal de conversão instantâneo para WhatsApp e arquitetura sem dependências pesadas para carregamento veloz.
+            Website para arquiteto de alto padrão. Layout elegante, catálogo dinâmico de projetos residenciais e comerciais com filtros instantâneos, captação direta via WhatsApp e carregamento veloz.
           </p>
           <div class="project-tags">
             <span class="ptag">JavaScript</span>
@@ -944,7 +951,7 @@ async function generateResume() {
           </div>
           <div class="project-tagline">Plataforma internacional com seletor instantâneo de idioma (EN/PT/ES) e animações fluidas</div>
           <p class="project-desc">
-            Landing page corporativa para professora internacional de inglês. Sistema personalizado de internacionalização (i18n) em 3 idiomas sem recarregamento de página, persistência de preferências de tema claro/escuro com LocalStorage, animações com biblioteca AOS e agendamento internacional de aulas.
+            Landing page corporativa para professora internacional de inglês. Sistema de internacionalização (i18n) em 3 idiomas sem recarregamento, suporte a Dark & Light Mode com LocalStorage e agendamento de aulas.
           </p>
           <div class="project-tags">
             <span class="ptag">JavaScript ES6+</span>
@@ -961,11 +968,11 @@ async function generateResume() {
             <div class="project-title">
               <span>Só Se For Açaí &bull; Delivery Interativo & Wizard</span>
             </div>
-            <span class="ptag" style="color: #10B981; border-color: rgba(16,185,129,0.3);">Single Page App &bull; Checkout WhatsApp</span>
+            <span class="ptag" style="color: #10B981; border-color: rgba(168,85,247,0.3);">Single Page App &bull; Checkout WhatsApp</span>
           </div>
           <div class="project-tagline">Web app estilo wizard passo a passo com cálculo dinâmico de adicionais e checkout</div>
           <p class="project-desc">
-            Aplicativo web interativo para delivery eliminando cardápios estáticos em PDF. O cliente monta seu açaí em 4 etapas intuitivas, visualiza o preço atualizado em tempo real a cada cobertura adicionada e gera automaticamente o pedido formatado e higienizado direto para o WhatsApp do comércio.
+            Aplicativo web interativo para delivery eliminando cardápios estáticos em PDF. Montagem do açaí em 4 etapas, totalizador em tempo real e geração de pedido formatado para o WhatsApp da loja.
           </p>
           <div class="project-tags">
             <span class="ptag">JavaScript SPA</span>
@@ -1036,7 +1043,7 @@ async function generateResume() {
           <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 1mm;">
             <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10B981;"></span>
             <strong style="color: #FFFFFF;">Padrões de Produção Enterprise:</strong>
-            <span style="color: #94A3B8;">Sanitização de inputs, proteção CSRF/CORS, isolamento multi-tenant, graceful recovery de processos e logging estruturado.</span>
+            <span style="color: #94A3B8;">Sanitização de inputs, proteção CSRF/CORS, isolamento multi-tenant, graceful recovery e logging estruturado.</span>
           </div>
         </div>
       </section>
@@ -1052,7 +1059,7 @@ async function generateResume() {
 
       <!-- RODAPÉ PÁGINA 2 -->
       <footer class="page-footer">
-        <span>Jeferson Taveira &bull; <a href="https://github.com/jefersontaveira">github.com/jefersontaveira</a> &bull; (85) 98131-1975</span>
+        <span>Jeferson Taveira &bull; <a href="https://jefersontave.vercel.app/">jefersontave.vercel.app</a> &bull; (85) 98131-1975</span>
         <span>Página 2 de 2</span>
       </footer>
     </main>
